@@ -1,0 +1,320 @@
+Gizmo {
+ knobChanged "from ltx_matte import bridge; bridge.knob_changed(nuke.thisNode(), nuke.thisKnob())"
+ tile_color 0x2e6e5aff
+ label "LTX Matte"
+ addUserKnob {20 matte_tab l "LTX Matte"}
+ addUserKnob {26 guide l "" +STARTLINE T "Connect the Plate. Pick the subject, click <b>Find Subject</b>, then <b>Queue Matte</b>."}
+ addUserKnob {26 range_title l "" +STARTLINE T "<b>Frame range</b>"}
+ addUserKnob {3 plate_first l First t "First frame of the plate to matte."}
+ plate_first 1
+ addUserKnob {3 plate_last l Last t "Last frame, inclusive. LTX takes 9, 17, 25 ... up to 145 frames, so the end may be trimmed." -STARTLINE}
+ plate_last 49
+ addUserKnob {22 use_range l "Use Plate Range" t "Copy the connected plate's frame range, up to 145 frames." -STARTLINE T "from ltx_matte import bridge; bridge.use_plate_range(nuke.thisNode())"}
+ addUserKnob {26 subject_title l "" +STARTLINE T <b>Subject</b>}
+ addUserKnob {4 select_mode l Select t "Auto: LTX mattes whatever it sees as foreground. Text: type what to matte. Click: place points on it in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input." M {Auto Text Click Box Roto}}
+ select_mode Text
+ addUserKnob {1 subject_text l Object t "What to matte, in a few words: doll, horse, red car. Several with commas: rider, horse."}
+ addUserKnob {3 select_frame l "On frame" t "The frame where your points or box sit. The subject is tracked from there through the range."}
+ select_frame 1
+ addUserKnob {12 p1 l "Point 1" t "A point on the subject. Drag it in the Viewer."}
+ p1 {960 540}
+ addUserKnob {6 p1_on l use t "Use this point." -STARTLINE}
+ p1_on true
+ addUserKnob {12 p2 l "Point 2" t "A point on the subject. Drag it in the Viewer."}
+ addUserKnob {6 p2_on l use t "Use this point." -STARTLINE}
+ addUserKnob {12 p3 l "Point 3" t "A point on the subject. Drag it in the Viewer."}
+ addUserKnob {6 p3_on l use t "Use this point." -STARTLINE}
+ addUserKnob {12 n1 l "Not this" t "A point on something that must not be in the matte."}
+ n1 {200 540}
+ addUserKnob {6 n1_on l use t "Use this point." -STARTLINE}
+ addUserKnob {15 subject_box l Box t "A box around the subject. Drag its corners in the Viewer."}
+ subject_box {700 200 1200 900}
+ addUserKnob {22 find_subject l "Find Subject" t "Track the subject through the range with SAM3 and show its mask (View > Subject)." T "from ltx_matte import bridge; bridge.find_subject(nuke.thisNode())" +STARTLINE}
+ addUserKnob {6 isolate l "Isolate subject for LTX" t "LTX cannot be told what to matte, so everything outside the subject is replaced with flat grey before it renders. Turn off to send the plate unchanged." +STARTLINE}
+ isolate true
+ addUserKnob {7 iso_expand l "Isolate margin" t "Pixels kept around the subject when isolating it, so its edges reach LTX intact."}
+ iso_expand 12
+ addUserKnob {7 garb_expand l "Clean margin" t "The finished matte is cut to the subject plus this many pixels, which removes anything else LTX found."}
+ garb_expand 24
+ addUserKnob {7 garb_soft l "Clean softness" t "Softness of that cut, in pixels." -STARTLINE}
+ garb_soft 12
+ addUserKnob {7 halo_cut l "Halo cut" t "Around the subject, matte values below this are removed and the rest stretched back to full. Hair strands are strong and stay; the faint ring LTX can leave at the edge of the isolated plate goes. 0 keeps everything LTX gave."}
+ halo_cut 0.35
+ addUserKnob {6 garbage_on l "Clean matte with subject" t "Multiply the matte by the subject mask. Applies whenever a subject is selected." +STARTLINE}
+ garbage_on true
+ addUserKnob {26 output_title l "" +STARTLINE T <b>Output</b>}
+ addUserKnob {3 size_short l Size t "The plate's shorter side while LTX renders, a multiple of 32. The matte is scaled back to the plate. Larger is sharper and slower; LTX takes at most 1920x1088."}
+ size_short 704
+ addUserKnob {22 size_down l ▼ t "32 pixels smaller." -STARTLINE T "from ltx_matte import bridge; bridge.step_size_down(nuke.thisNode())"}
+ addUserKnob {22 size_up l ▲ t "32 pixels larger." -STARTLINE T "from ltx_matte import bridge; bridge.step_size_up(nuke.thisNode())"}
+ addUserKnob {26 size_info l "" -STARTLINE T "Connect the Plate to see the render size."}
+ addUserKnob {4 view l View t "Final: the plate with the matte as alpha, premultiplied. Matte: the alpha alone. Subject: the selected subject over the dimmed plate. Isolated: what LTX receives. Plate: the input unchanged." M {Final Matte Subject Isolated Plate}}
+ addUserKnob {3 start_at l "Place render at" t "Timeline frame where the results start. It follows First unless you type a different frame."}
+ start_at 1
+ addUserKnob {6 start_follows -STARTLINE +INVISIBLE}
+ start_follows true
+ addUserKnob {1 seed_text l Seed t "Noise seed. Change it for a variation."}
+ seed_text 42
+ addUserKnob {2 render_dir l "Render folder" t "Parent folder for numbered runs. Empty: an LTXMatteRenders folder next to the script."}
+ addUserKnob {3 output_version l Version t "The numbered run: version 1 uses 0001."}
+ output_version 1
+ addUserKnob {22 version_up_output l "Version Up Output" t "Select the next unused version." -STARTLINE T "from ltx_matte import bridge; bridge.version_up(nuke.thisNode())"}
+ addUserKnob {22 queue_job l "Queue Matte" t "Render the matte in ComfyUI." T "from ltx_matte import bridge; bridge.queue(nuke.thisNode())" +STARTLINE}
+ addUserKnob {22 cancel_job l "Cancel Request" t "Stop this node's active job." -STARTLINE T "from ltx_matte import bridge; bridge.cancel(nuke.thisNode())"}
+ addUserKnob {22 reload l "Reload Results" t "Load this version's Subject and Matte frames again, for example after reopening the script." -STARTLINE T "from ltx_matte import bridge; bridge.reload_results(nuke.thisNode())"}
+ addUserKnob {22 read_matte l "Bring Matte" t "Create a Read of the Matte EXR frames." T "from ltx_matte import bridge; bridge.bring_matte(nuke.thisNode())" +STARTLINE}
+ addUserKnob {22 read_sheet l "Bring Contact Sheet" t "Create a Read of the contact sheet video." -STARTLINE T "from ltx_matte import bridge; bridge.bring_sheet(nuke.thisNode())"}
+ addUserKnob {1 job_status l Status +DISABLED}
+ job_status Idle
+ addUserKnob {1 job_id +INVISIBLE}
+ addUserKnob {1 job_host +INVISIBLE}
+ addUserKnob {1 job_folder +INVISIBLE}
+ addUserKnob {1 sheet_path +INVISIBLE}
+ addUserKnob {1 matte_path +INVISIBLE}
+ addUserKnob {1 select_path +INVISIBLE}
+ addUserKnob {20 settings_tab l Settings}
+ addUserKnob {1 server l "ComfyUI URL" t "Address of the ComfyUI server that renders."}
+ server http://127.0.0.1:8188
+ addUserKnob {2 ffmpeg_path +INVISIBLE}
+ addUserKnob {2 comfy_root +INVISIBLE}
+ addUserKnob {22 check_setup l "Check Setup" t "Find FFmpeg, then check the server, the workflow's nodes and models, and SAM3." T "from ltx_matte import bridge; bridge.check_setup(nuke.thisNode())" +STARTLINE}
+ addUserKnob {26 detected_paths l "" +STARTLINE T "FFmpeg and the ComfyUI folder are found automatically. Click Check Setup to see them."}
+ addUserKnob {26 prompt_title l "" +STARTLINE T "<b>Prompts</b><br>Lightricks trains Alpha Gen with an empty prompt, so these rarely change the matte. They are kept because your workflow has them."}
+ addUserKnob {43 positive +INVISIBLE}
+ addUserKnob {43 negative +INVISIBLE}
+ addUserKnob {52 prompt_editor l "" +STARTLINE T "__import__('ltx_matte.prompt_ui', fromlist=('PromptEditor',)).PromptEditor()" +STARTLINE}
+ addUserKnob {7 lora_strength l "LoRA strength" t "Alpha Gen LoRA strength. Lightricks uses 1.0."}
+ lora_strength 1
+ addUserKnob {20 models_tab l Models}
+ addUserKnob {1 transformer l Transformer t "Filename on the ComfyUI server."}
+ transformer ltx-2.5-22b-distilled-transformer-bf16.safetensors
+ addUserKnob {1 text_encoder l "Text encoder" t "Filename on the ComfyUI server."}
+ text_encoder gemma4-12b-with-proj-ltx-2.5-bf16.safetensors
+ addUserKnob {1 prompt_enhancer l "Prompt enhancer" t "Filename on the ComfyUI server."}
+ prompt_enhancer gemma4_e2b_it_bf16.safetensors
+ addUserKnob {1 video_vae l "Video VAE" t "Filename on the ComfyUI server."}
+ video_vae ltx-2.5-video-vae-bf16.safetensors
+ addUserKnob {1 audio_vae l "Audio VAE" t "Filename on the ComfyUI server."}
+ audio_vae ltx-2.5-audio-vae-bf16.safetensors
+ addUserKnob {1 alpha_lora l "Alpha Gen LoRA" t "Filename on the ComfyUI server."}
+ alpha_lora ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors
+}
+ Input {
+  inputs 0
+  name Plate
+  xpos 0
+ }
+ Dot {
+  name PlateIn
+  xpos 220
+  ypos 66
+ }
+set N16446000 [stack 0]
+ Input {
+  inputs 0
+  name Roto
+  xpos 110
+  ypos 33
+  number 1
+ }
+ Read {
+  inputs 0
+  on_error black
+  raw true
+  in_colorspace scene_linear
+  out_colorspace scene_linear
+  name SelectRead
+  xpos 330
+  ypos 99
+ }
+ Reformat {
+  type "to box"
+  box_width {{PlateIn.width}}
+  box_height {{PlateIn.height}}
+  box_fixed true
+  resize fill
+  name SelectFit
+  xpos 440
+  ypos 132
+ }
+ Expression {
+  expr3 r
+  name SubjectFromSam
+  xpos 550
+  ypos 165
+ }
+ Switch {
+  inputs 2
+  which {{"parent.select_mode == 4"}}
+  name SubjectSource
+  xpos 660
+  ypos 198
+ }
+set N1644ef00 [stack 0]
+ Dilate {
+  channels alpha
+  size {{parent.iso_expand}}
+  name IsolateGrow
+  xpos 770
+  ypos 231
+ }
+ Blur {
+  channels alpha
+  size {{"parent.iso_expand / 2"}}
+  name IsolateSoft
+  xpos 880
+  ypos 264
+ }
+push $N16446000
+push $N16446000
+ Expression {
+  expr0 0.18
+  expr1 0.18
+  expr2 0.18
+  name IsolateFill
+  xpos 990
+  ypos 297
+ }
+ Keymix {
+  inputs 3
+  name ToRender
+  xpos 1100
+  ypos 330
+ }
+push $N1644ef00
+push $N16446000
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name SubjectOnPlate
+  xpos 2640
+  ypos 792
+ }
+ Expression {
+  expr0 "r * (0.12 + 0.88 * a)"
+  expr1 "g * (0.12 + 0.88 * a)"
+  expr2 "b * (0.12 + 0.88 * a)"
+  name SubjectView
+  xpos 2750
+  ypos 825
+ }
+push $N1644ef00
+ Dilate {
+  channels alpha
+  size {{parent.garb_expand}}
+  name CleanGrow
+  xpos 1540
+  ypos 462
+ }
+ Blur {
+  channels alpha
+  size {{parent.garb_soft}}
+  name CleanSoft
+  xpos 1650
+  ypos 495
+ }
+push $N1644ef00
+ Blur {
+  channels alpha
+  size 3
+  name CoreSoft
+  xpos 1760
+  ypos 528
+ }
+ Read {
+  inputs 0
+  on_error black
+  raw true
+  in_colorspace scene_linear
+  out_colorspace scene_linear
+  name MatteRead
+  xpos 1210
+  ypos 363
+ }
+ Reformat {
+  type "to box"
+  box_width {{PlateIn.width}}
+  box_height {{PlateIn.height}}
+  box_fixed true
+  resize fill
+  name MatteFit
+  xpos 1320
+  ypos 396
+ }
+ Expression {
+  expr3 r
+  name MatteAlpha
+  xpos 1430
+  ypos 429
+ }
+set N16451200 [stack 0]
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.red
+  name PackCore
+  xpos 1870
+  ypos 561
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.green
+  name PackBand
+  xpos 1980
+  ypos 594
+ }
+ Expression {
+  temp_name0 h
+  temp_expr0 parent.halo_cut
+  expr3 "r * a + (1 - r) * g * clamp((a - h) / max(1 - h, 0.001))"
+  name CleanMatte
+  xpos 2090
+  ypos 627
+ }
+push $N16451200
+ Switch {
+  inputs 2
+  which {{"parent.garbage_on && parent.select_mode != 0"}}
+  name UseClean
+  xpos 2200
+  ypos 660
+ }
+set N164c9900 [stack 0]
+ Expression {
+  expr0 a
+  expr1 a
+  expr2 a
+  name MatteView
+  xpos 2530
+  ypos 759
+ }
+push $N164c9900
+push $N16446000
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name MatteToPlate
+  xpos 2310
+  ypos 693
+ }
+ Premult {
+  name Final
+  xpos 2420
+  ypos 726
+ }
+ Switch {
+  inputs 5
+  which {{parent.view}}
+  name View
+  xpos 2860
+  ypos 858
+ }
+ Output {
+  name Output1
+  xpos 2970
+  ypos 891
+ }
+end_group

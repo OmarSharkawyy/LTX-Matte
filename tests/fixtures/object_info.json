@@ -1,0 +1,3009 @@
+{
+ "CFGGuider": {
+  "input": {
+   "required": {
+    "cfg": [
+     "FLOAT",
+     {
+      "default": 8.0,
+      "max": 100.0,
+      "min": 0.0,
+      "round": 0.01,
+      "step": 0.1
+     }
+    ],
+    "model": [
+     "MODEL",
+     {}
+    ],
+    "negative": [
+     "CONDITIONING",
+     {}
+    ],
+    "positive": [
+     "CONDITIONING",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "GUIDER"
+  ]
+ },
+ "CLIPLoader": {
+  "input": {
+   "optional": {
+    "device": [
+     [
+      "default",
+      "cpu"
+     ],
+     {
+      "advanced": true
+     }
+    ]
+   },
+   "required": {
+    "clip_name": [
+     [
+      "gemma4-12b-with-proj-ltx-2.5-bf16.safetensors",
+      "gemma4_e2b_it_bf16.safetensors"
+     ]
+    ],
+    "type": [
+     [
+      "stable_diffusion",
+      "stable_cascade",
+      "sd3",
+      "stable_audio",
+      "mochi",
+      "ltxv",
+      "pixart",
+      "cosmos",
+      "lumina2",
+      "wan",
+      "hidream",
+      "chroma",
+      "ace",
+      "omnigen2",
+      "qwen_image",
+      "hunyuan_image",
+      "flux2",
+      "ovis",
+      "longcat_image",
+      "cogvideox",
+      "lens",
+      "pixeldit",
+      "ideogram4",
+      "boogu",
+      "krea2",
+      "joyimage",
+      "mage",
+      "minimax",
+      "yue2",
+      "flux3",
+      "moss_image",
+      "fibo2"
+     ]
+    ]
+   }
+  },
+  "output": [
+   "CLIP"
+  ]
+ },
+ "CLIPTextEncode": {
+  "input": {
+   "required": {
+    "clip": [
+     "CLIP",
+     {
+      "tooltip": "The CLIP model used for encoding the text."
+     }
+    ],
+    "text": [
+     "STRING",
+     {
+      "dynamicPrompts": true,
+      "multiline": true,
+      "tooltip": "The text to be encoded."
+     }
+    ]
+   }
+  },
+  "output": [
+   "CONDITIONING"
+  ]
+ },
+ "ComfySwitchNode": {
+  "input": {
+   "optional": {
+    "on_false": [
+     "COMFY_MATCHTYPE_V3",
+     {
+      "lazy": true,
+      "template": {
+       "allowed_types": "*",
+       "template_id": "switch"
+      }
+     }
+    ],
+    "on_true": [
+     "COMFY_MATCHTYPE_V3",
+     {
+      "lazy": true,
+      "template": {
+       "allowed_types": "*",
+       "template_id": "switch"
+      }
+     }
+    ]
+   },
+   "required": {
+    "switch": [
+     "BOOLEAN",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "COMFY_MATCHTYPE_V3"
+  ]
+ },
+ "CreateVideo": {
+  "input": {
+   "optional": {
+    "audio": [
+     "AUDIO",
+     {
+      "tooltip": "The audio to add to the video."
+     }
+    ],
+    "bit_depth": [
+     "COMBO",
+     {
+      "default": "auto",
+      "multiselect": false,
+      "options": [
+       "auto",
+       8,
+       10
+      ],
+      "tooltip": "Auto uses 8-bit for sRGB and 10-bit for HDR. Explicit 8-bit and 10-bit choices are independent of colorspace."
+     }
+    ],
+    "codec": [
+     "COMBO",
+     {
+      "advanced": true,
+      "default": "none",
+      "multiselect": false,
+      "options": [
+       "none",
+       "auto",
+       "h264",
+       "av1"
+      ],
+      "tooltip": "Optionally encode the video immediately. None keeps the images in tensor form; Auto uses H.264."
+     }
+    ],
+    "color_space": [
+     "COMBO",
+     {
+      "default": "sRGB",
+      "multiselect": false,
+      "options": [
+       "sRGB",
+       "HDR",
+       "HDR PQ"
+      ],
+      "tooltip": "Colorspace of the input images. HDR selects BT.2020/HLG and HDR PQ selects BT.2020/PQ."
+     }
+    ]
+   },
+   "required": {
+    "fps": [
+     "FLOAT",
+     {
+      "default": 30.0,
+      "max": 120.0,
+      "min": 1.0,
+      "step": 1.0
+     }
+    ],
+    "images": [
+     "IMAGE",
+     {
+      "tooltip": "The images to create a video from."
+     }
+    ]
+   }
+  },
+  "output": [
+   "VIDEO"
+  ]
+ },
+ "EmptyImage": {
+  "input": {
+   "required": {
+    "batch_size": [
+     "INT",
+     {
+      "default": 1,
+      "max": 4096,
+      "min": 1
+     }
+    ],
+    "color": [
+     "INT",
+     {
+      "default": 0,
+      "display": "color",
+      "max": 16777215,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "height": [
+     "INT",
+     {
+      "default": 512,
+      "max": 16384,
+      "min": 1,
+      "step": 1
+     }
+    ],
+    "width": [
+     "INT",
+     {
+      "default": 512,
+      "max": 16384,
+      "min": 1,
+      "step": 1
+     }
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "EmptyLTXVLatentVideo": {
+  "input": {
+   "required": {
+    "batch_size": [
+     "INT",
+     {
+      "default": 1,
+      "max": 4096,
+      "min": 1
+     }
+    ],
+    "height": [
+     "INT",
+     {
+      "default": 512,
+      "max": 16384,
+      "min": 64,
+      "step": 32
+     }
+    ],
+    "length": [
+     "INT",
+     {
+      "default": 97,
+      "max": 16384,
+      "min": 1,
+      "step": 8
+     }
+    ],
+    "width": [
+     "INT",
+     {
+      "default": 768,
+      "max": 16384,
+      "min": 64,
+      "step": 32
+     }
+    ]
+   }
+  },
+  "output": [
+   "LATENT"
+  ]
+ },
+ "GemmaAPITextEncode": {
+  "input": {
+   "required": {
+    "api_key": [
+     "STRING",
+     {
+      "default": "",
+      "multiline": false,
+      "placeholder": "API_KEY",
+      "tooltip": "API key for authentication"
+     }
+    ],
+    "ckpt_name": [
+     [
+      "ltx-2.5-22b-distilled-transformer-bf16.safetensors"
+     ],
+     {
+      "tooltip": "The model to read the API text-encoder selector from. Either a checkpoint or a diffusion model."
+     }
+    ],
+    "enhance_prompt": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "When enabled, the prompt is enhanced using Gemma 3 before encoding"
+     }
+    ],
+    "prompt": [
+     "STRING",
+     {
+      "default": "",
+      "multiline": true,
+      "tooltip": "Text prompt to encode"
+     }
+    ]
+   }
+  },
+  "output": [
+   "CONDITIONING"
+  ]
+ },
+ "GetImageSize": {
+  "input": {
+   "hidden": {
+    "unique_id": [
+     "UNIQUE_ID"
+    ]
+   },
+   "required": {
+    "image": [
+     "IMAGE",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "INT",
+   "INT",
+   "INT"
+  ]
+ },
+ "GetVideoComponents": {
+  "input": {
+   "required": {
+    "video": [
+     "VIDEO",
+     {
+      "tooltip": "The video to extract components from."
+     }
+    ]
+   }
+  },
+  "output": [
+   "IMAGE",
+   "AUDIO",
+   "FLOAT",
+   "COMBO",
+   "COMBO"
+  ]
+ },
+ "ImageBlend": {
+  "input": {
+   "required": {
+    "blend_factor": [
+     "FLOAT",
+     {
+      "default": 0.5,
+      "max": 1.0,
+      "min": 0.0,
+      "step": 0.01
+     }
+    ],
+    "blend_mode": [
+     "COMBO",
+     {
+      "multiselect": false,
+      "options": [
+       "normal",
+       "multiply",
+       "screen",
+       "overlay",
+       "soft_light",
+       "difference"
+      ]
+     }
+    ],
+    "image1": [
+     "IMAGE",
+     {}
+    ],
+    "image2": [
+     "IMAGE",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "ImageCompositeMasked": {
+  "input": {
+   "optional": {
+    "mask": [
+     "MASK",
+     {}
+    ]
+   },
+   "required": {
+    "destination": [
+     "IMAGE",
+     {}
+    ],
+    "resize_source": [
+     "BOOLEAN",
+     {
+      "default": false
+     }
+    ],
+    "source": [
+     "IMAGE",
+     {}
+    ],
+    "x": [
+     "INT",
+     {
+      "default": 0,
+      "max": 16384,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "y": [
+     "INT",
+     {
+      "default": 0,
+      "max": 16384,
+      "min": 0,
+      "step": 1
+     }
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "ImageConcatMulti": {
+  "input": {
+   "optional": {
+    "image_2": [
+     "IMAGE,MASK",
+     {}
+    ]
+   },
+   "required": {
+    "direction": [
+     "COMBO",
+     {
+      "default": "right",
+      "multiselect": false,
+      "options": [
+       "right",
+       "down",
+       "left",
+       "up"
+      ]
+     }
+    ],
+    "image_1": [
+     "COMFY_MATCHTYPE_V3",
+     {
+      "template": {
+       "allowed_types": "IMAGE,MASK",
+       "template_id": "multi_image_or_mask"
+      }
+     }
+    ],
+    "inputcount": [
+     "INT",
+     {
+      "default": 2,
+      "max": 1000,
+      "min": 2,
+      "step": 1
+     }
+    ],
+    "match_image_size": [
+     "BOOLEAN",
+     {
+      "default": false
+     }
+    ]
+   }
+  },
+  "output": [
+   "COMFY_MATCHTYPE_V3"
+  ]
+ },
+ "ImageScaleBy": {
+  "input": {
+   "required": {
+    "image": [
+     "IMAGE"
+    ],
+    "scale_by": [
+     "FLOAT",
+     {
+      "default": 1.0,
+      "max": 8.0,
+      "min": 0.01,
+      "step": 0.01
+     }
+    ],
+    "upscale_method": [
+     [
+      "nearest-exact",
+      "bilinear",
+      "area",
+      "bicubic",
+      "lanczos"
+     ]
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "ImageToMask": {
+  "input": {
+   "required": {
+    "channel": [
+     "COMBO",
+     {
+      "multiselect": false,
+      "options": [
+       "red",
+       "green",
+       "blue",
+       "alpha"
+      ]
+     }
+    ],
+    "image": [
+     "IMAGE",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "MASK"
+  ]
+ },
+ "JoinImageWithAlpha": {
+  "input": {
+   "required": {
+    "alpha": [
+     "MASK",
+     {}
+    ],
+    "image": [
+     "IMAGE",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "KSamplerSelect": {
+  "input": {
+   "required": {
+    "sampler_name": [
+     "COMBO",
+     {
+      "multiselect": false,
+      "options": [
+       "euler",
+       "euler_cfg_pp",
+       "euler_ancestral",
+       "euler_ancestral_cfg_pp",
+       "heun",
+       "heunpp2",
+       "exp_heun_2_x0",
+       "exp_heun_2_x0_sde",
+       "dpm_2",
+       "dpm_2_ancestral",
+       "lms",
+       "dpm_fast",
+       "dpm_adaptive",
+       "dpmpp_2s_ancestral",
+       "dpmpp_2s_ancestral_cfg_pp",
+       "dpmpp_sde",
+       "dpmpp_sde_gpu",
+       "dpmpp_2m",
+       "dpmpp_2m_cfg_pp",
+       "dpmpp_2m_sde",
+       "dpmpp_2m_sde_gpu",
+       "dpmpp_2m_sde_heun",
+       "dpmpp_2m_sde_heun_gpu",
+       "dpmpp_3m_sde",
+       "dpmpp_3m_sde_gpu",
+       "ddpm",
+       "lcm",
+       "ipndm",
+       "ipndm_v",
+       "deis",
+       "cfgpp_ud10_ab",
+       "res_multistep",
+       "res_multistep_cfg_pp",
+       "res_multistep_ancestral",
+       "res_multistep_ancestral_cfg_pp",
+       "gradient_estimation",
+       "gradient_estimation_cfg_pp",
+       "er_sde",
+       "seeds_2",
+       "seeds_3",
+       "sa_solver",
+       "sa_solver_pece",
+       "ddim",
+       "uni_pc",
+       "uni_pc_bh2"
+      ]
+     }
+    ]
+   }
+  },
+  "output": [
+   "SAMPLER"
+  ]
+ },
+ "LTXAddVideoICLoRAGuide": {
+  "input": {
+   "optional": {
+    "tile_frames": [
+     "INT",
+     {
+      "default": 97,
+      "max": 1000,
+      "min": 0,
+      "step": 1,
+      "tooltip": "Window length in pixel frames, used only when use_streaming is on. Snapped to 8n+1. Must match LTXVTiledFusionSampler. Ignored when use_streaming is off."
+     }
+    ],
+    "use_streaming": [
+     "BOOLEAN",
+     {
+      "default": false,
+      "tooltip": "Off (default): encode the whole clip as one IC-LoRA guide. On: re-encode one fresh guide per LTXVTiledFusionSampler temporal window and write the plan the sampler reads. Set tile_frames on this node and the sampler to the same value (97 for LTX)."
+     }
+    ]
+   },
+   "required": {
+    "crop": [
+     "COMBO",
+     {
+      "default": "disabled",
+      "multiselect": false,
+      "options": [
+       "disabled",
+       "center"
+      ],
+      "tooltip": "Crop mode when resizing. 'center' crops to fit, 'disabled' stretches to fit."
+     }
+    ],
+    "frame_idx": [
+     "INT",
+     {
+      "default": 0,
+      "max": 9999,
+      "min": -9999,
+      "tooltip": "RoPE position of the reference, in pixel frames.\n0 aligns the reference with the generated clip. Use for video references.\n>0 places the reference at a specific pixel-frame position in the clip.\n-1 places the reference outside the generated frame range, while still using it for attention conditioning. Use for single-image references.\nFor multi-frame references, >0 values are rounded down to 1 mod 8."
+     }
+    ],
+    "image": [
+     "IMAGE",
+     {}
+    ],
+    "latent": [
+     "LATENT",
+     {
+      "tooltip": "Video-only latent to condition. Must be a 5D video latent (batch, channels, frames, height, width)."
+     }
+    ],
+    "latent_downscale_factor": [
+     "FLOAT",
+     {
+      "default": 1.0,
+      "max": 10.0,
+      "min": 1.0,
+      "step": 1.0,
+      "tooltip": "For IC-LoRA on small grid. 1 means original size, 2 means half size, 3 means third, etc."
+     }
+    ],
+    "negative": [
+     "CONDITIONING",
+     {}
+    ],
+    "positive": [
+     "CONDITIONING",
+     {}
+    ],
+    "strength": [
+     "FLOAT",
+     {
+      "default": 1.0,
+      "max": 1.0,
+      "min": 0.0,
+      "step": 0.01
+     }
+    ],
+    "tile_overlap": [
+     "INT",
+     {
+      "default": 64,
+      "max": 256,
+      "min": 16,
+      "step": 16,
+      "tooltip": "Overlap between tiles for tiled encoding. Only used when use_tiled_encode is enabled."
+     }
+    ],
+    "tile_size": [
+     "INT",
+     {
+      "default": 256,
+      "max": 512,
+      "min": 64,
+      "step": 32,
+      "tooltip": "Spatial tile size for tiled encoding. Only used when use_tiled_encode is enabled."
+     }
+    ],
+    "use_tiled_encode": [
+     "BOOLEAN",
+     {
+      "default": false,
+      "tooltip": "Enable tiled VAE encoding for large resolutions/long videos to reduce memory usage."
+     }
+    ],
+    "vae": [
+     "VAE",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "CONDITIONING",
+   "CONDITIONING",
+   "LATENT"
+  ]
+ },
+ "LTXICLoRALoaderModelOnly": {
+  "input": {
+   "required": {
+    "lora_name": [
+     "COMBO",
+     {
+      "multiselect": false,
+      "options": [
+       "ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors"
+      ]
+     }
+    ],
+    "model": [
+     "MODEL",
+     {}
+    ],
+    "strength_model": [
+     "FLOAT",
+     {
+      "default": 1.0,
+      "max": 100.0,
+      "min": -100.0,
+      "step": 0.01
+     }
+    ]
+   }
+  },
+  "output": [
+   "MODEL",
+   "FLOAT"
+  ]
+ },
+ "LTXVConcatAVLatent": {
+  "input": {
+   "required": {
+    "audio_latent": [
+     "LATENT",
+     {}
+    ],
+    "video_latent": [
+     "LATENT",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "LATENT"
+  ]
+ },
+ "LTXVConditioning": {
+  "input": {
+   "required": {
+    "frame_rate": [
+     "FLOAT",
+     {
+      "default": 25.0,
+      "max": 1000.0,
+      "min": 0.0,
+      "step": 0.01
+     }
+    ],
+    "negative": [
+     "CONDITIONING",
+     {}
+    ],
+    "positive": [
+     "CONDITIONING",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "CONDITIONING",
+   "CONDITIONING"
+  ]
+ },
+ "LTXVCropGuides": {
+  "input": {
+   "required": {
+    "latent": [
+     "LATENT",
+     {}
+    ],
+    "negative": [
+     "CONDITIONING",
+     {}
+    ],
+    "positive": [
+     "CONDITIONING",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "CONDITIONING",
+   "CONDITIONING",
+   "LATENT"
+  ]
+ },
+ "LTXVEmptyLatentAudio": {
+  "input": {
+   "required": {
+    "audio_vae": [
+     "VAE",
+     {
+      "display_name": "Audio VAE",
+      "tooltip": "The Audio VAE model to get configuration from."
+     }
+    ],
+    "batch_size": [
+     "INT",
+     {
+      "default": 1,
+      "display": "number",
+      "max": 4096,
+      "min": 1,
+      "tooltip": "The number of latent audio samples in the batch."
+     }
+    ],
+    "frame_rate": [
+     "FLOAT,INT",
+     {
+      "default": 25.0,
+      "display": "number",
+      "max": 1000.0,
+      "min": 1.0,
+      "step": 0.01,
+      "tooltip": "Number of frames per second.",
+      "widgetType": "FLOAT"
+     }
+    ],
+    "frames_number": [
+     "INT",
+     {
+      "default": 97,
+      "display": "number",
+      "max": 1000,
+      "min": 1,
+      "step": 1,
+      "tooltip": "Number of frames."
+     }
+    ]
+   }
+  },
+  "output": [
+   "LATENT"
+  ]
+ },
+ "LTXVSeparateAVLatent": {
+  "input": {
+   "required": {
+    "av_latent": [
+     "LATENT",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "LATENT",
+   "LATENT"
+  ]
+ },
+ "LoadSAM3Model": {
+  "input": {
+   "optional": {
+    "compile": [
+     "BOOLEAN",
+     {
+      "default": false,
+      "tooltip": "Enable torch.compile for faster inference. Model loading takes longer (pre-compiles all code paths), but inference is significantly faster on every run."
+     }
+    ],
+    "precision": [
+     "COMBO",
+     {
+      "default": "auto",
+      "multiselect": false,
+      "options": [
+       "auto",
+       "bf16",
+       "fp16",
+       "fp32"
+      ],
+      "tooltip": "Model precision. auto: best for your GPU (bf16 on Ampere+, fp16 on Volta/Turing, fp32 on older)."
+     }
+    ]
+   },
+   "required": {}
+  },
+  "output": [
+   "SAM3_MODEL_CONFIG"
+  ]
+ },
+ "ManualSigmas": {
+  "input": {
+   "required": {
+    "sigmas": [
+     "STRING",
+     {
+      "default": "1, 0.5",
+      "multiline": false
+     }
+    ]
+   }
+  },
+  "output": [
+   "SIGMAS"
+  ]
+ },
+ "MaskComposite": {
+  "input": {
+   "required": {
+    "destination": [
+     "MASK",
+     {}
+    ],
+    "operation": [
+     "COMBO",
+     {
+      "multiselect": false,
+      "options": [
+       "multiply",
+       "add",
+       "subtract",
+       "and",
+       "or",
+       "xor"
+      ]
+     }
+    ],
+    "source": [
+     "MASK",
+     {}
+    ],
+    "x": [
+     "INT",
+     {
+      "default": 0,
+      "max": 16384,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "y": [
+     "INT",
+     {
+      "default": 0,
+      "max": 16384,
+      "min": 0,
+      "step": 1
+     }
+    ]
+   }
+  },
+  "output": [
+   "MASK"
+  ]
+ },
+ "MaskToImage": {
+  "input": {
+   "required": {
+    "mask": [
+     "MASK",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "OCIOWrite": {
+  "input": {
+   "optional": {
+    "alpha": [
+     "MASK",
+     {
+      "tooltip": "Optional alpha channel -> RGBA (EXR / TIFF / PNG; ignored for JPEG). Wire OCIO Read's alpha output, or any MASK."
+     }
+    ],
+    "audio": [
+     "AUDIO",
+     {
+      "tooltip": "Optional track. A video container muxes it in, trimmed to the frames written so it cannot drift; a sequence gets a sidecar .wav, because EXR / TIFF / PNG hold no audio. Formats per container: docs/NODES_IO.md."
+     }
+    ],
+    "fps": [
+     "FLOAT",
+     {
+      "default": 24.0,
+      "max": 240.0,
+      "min": 1.0,
+      "step": 0.001,
+      "tooltip": "Video frame rate. Wire OCIO Read's fps output here to carry the source rate. This sets the TIME BASE, it does not resample: the same frames are written either way, so a 24fps batch written at 48 plays twice as fast and half as long (a conform, not a frame-rate conversion). NTSC rates go out as their exact rational, 23.976 as 24000/1001."
+     }
+    ],
+    "images": [
+     "IMAGE",
+     {
+      "tooltip": "An image / sequence / video frame batch to write. Mutually exclusive with the ComfyUI Video input."
+     }
+    ],
+    "metadata": [
+     "STRING",
+     {
+      "forceInput": true,
+      "tooltip": "(optional) Wire OCIO Read's 'metadata' output here - or any node that emits the same JSON - to carry the plate's camera, lens, editorial attributes AND its start timecode into the written file. Claims a colour transform invalidates are dropped, not copied: docs/NODES_IO.md. A wire this node cannot read is reported and ignored; it never stops the render."
+     }
+    ],
+    "render_nonce": [
+     "STRING",
+     {
+      "default": "",
+      "tooltip": "Internal, hidden. The Render button bumps it so a repeat render to the same path really re-writes; ComfyUI would otherwise cache an identical Write and skip it."
+     }
+    ],
+    "video": [
+     "VIDEO",
+     {
+      "tooltip": "A ComfyUI native VIDEO (e.g. Load Video) to render out with ALL these Write settings (container, codec, colorspace, bit depth). Mutually exclusive with the image input; the movie's own frame rate is used for a video container."
+     }
+    ],
+    "view": [
+     [
+      "(none) colorimetric, no tone map",
+      "ACES 2.0 - SDR 100 nits (Rec.709)",
+      "Un-tone-mapped",
+      "Video (colorimetric)",
+      "Raw",
+      "ACES 2.0 - SDR 100 nits (P3 D65)",
+      "ACES 2.0 - HDR 1000 nits (P3 D65)",
+      "ACES 2.0 - HDR 1000 nits (Rec.2020)",
+      "ACES 2.0 - HDR 2000 nits (P3 D65)",
+      "ACES 2.0 - HDR 2000 nits (Rec.2020)",
+      "ACES 2.0 - HDR 4000 nits (P3 D65)",
+      "ACES 2.0 - HDR 4000 nits (Rec.2020)",
+      "ACES 2.0 - HDR 500 nits (P3 D65)",
+      "ACES 2.0 - HDR 500 nits (Rec.2020)",
+      "ACES 2.0 - HDR 108 nits (P3 D65)",
+      "ACES 1.3: ACES 1.0 - SDR Video",
+      "ACES 1.3: ACES 1.0 - SDR Video (D60 sim on D65)",
+      "ACES 1.3: Un-tone-mapped",
+      "ACES 1.3: Raw",
+      "ACES 1.3: ACES 1.1 - SDR Video (P3 lim)",
+      "ACES 1.3: ACES 1.1 - SDR Video (Rec.709 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (1000 nits & Rec.2020 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (2000 nits & Rec.2020 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (4000 nits & Rec.2020 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (1000 nits & P3 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (2000 nits & P3 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Video (4000 nits & P3 lim)",
+      "ACES 1.3: ACES 1.1 - HDR Cinema (108 nits & P3 lim)",
+      "ACES 1.3: ACES 1.0 - SDR Cinema",
+      "ACES 1.3: ACES 1.1 - SDR Cinema (Rec.709 lim)",
+      "ACES 1.3: ACES 1.1 - SDR Cinema (D60 sim on D65)",
+      "ACES 1.3: ACES 1.0 - SDR Cinema (D60 sim on DCI)",
+      "ACES 1.3: ACES 1.1 - SDR Cinema (D65 sim on DCI)"
+     ],
+     {
+      "default": "(none) colorimetric, no tone map",
+      "tooltip": "How to cross the scene/display boundary, on the pairs that cross it at all. Left on (none) the conversion is colorimetric: no tone mapping, so scene-linear 4.0 leaves as 1.78 and the container clips it flat. Pick a view and the ACES Output Transform is applied instead, rolling highlights off - 4.0 becomes 0.905, and nothing reaches 1.0 until about 128. Use a view for a review deliverable; leave it off for a technical re-encode or for material already scene-referred. Ignored entirely when both colorspaces sit on the same side, so camera logs and ACEScg to ACEScct are untouched."
+     }
+    ],
+    "write_audio": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "OFF: no sound at all, no muxed track and no sidecar .wav, even when one is wired or a native Video input brings its own. ON: the wired input wins, else the Video input's track. Off for a picture-only master."
+     }
+    ],
+    "write_sidecar": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "The <name>.json written beside the render, holding the FULL metadata set. ON is right for a movie, whose container cannot hold all of it - check `sidecar_only` in the file to see exactly what would be lost. OFF is safe for EXR, whose header already carries everything (`sidecar_only` is empty there), and for any delivery that must be the picture files and nothing else. It never affects the pixels, the container tags or the .wav beside a sequence."
+     }
+    ]
+   },
+   "required": {
+    "auto_colorspace": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "Superseded and inert - it changes nothing, which is why it is hidden. Use profile = 'auto', which traces the upstream source and covers more cases. Kept only so earlier saved graphs keep their other values in place."
+     }
+    ],
+    "auto_range": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "ON: first_frame / last_frame / start_number / fps come from the upstream OCIO Read. CANVAS ONLY - an API prompt gets whatever is in its JSON, with this ticked and doing nothing. Set the four explicitly for farm work."
+     }
+    ],
+    "bit_depth": [
+     [
+      "16f",
+      "32f",
+      "16",
+      "8",
+      "10"
+     ],
+     {
+      "default": "16f",
+      "tooltip": "Per format: JPEG 8; PNG 8/16; TIFF 8/16/32f; EXR 16f/32f; DPX 10/16. The list narrows to the chosen format."
+     }
+    ],
+    "colorspace_in_name": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "Put the output colorspace in the file name, before the frame number: name_acescg.0001.exr. Uses the sanitized output_colorspace (or 'raw' when Raw Data is on)."
+     }
+    ],
+    "compression": [
+     [
+      "zip",
+      "zips",
+      "piz",
+      "pxr24",
+      "dwaa",
+      "dwab",
+      "rle",
+      "none"
+     ],
+     {
+      "default": "zip",
+      "tooltip": "EXR compression. ZIP (default) / ZIPS / RLE are lossless; PIZ is lossless and suits grain. DWAA / DWAB are much smaller and LOSSY: measured on a real frame they cost about half the distinct values and multiply the error by eighty, at 16f as well as 32f, and they quantise float32 to HALF before compressing - so 32f + DWAA is a half-precision file that still says 'float'. Pick DWAA for a review or comp copy, never for a master or a data pass (depth, normals, IDs). EXR only."
+     }
+    ],
+    "container": [
+     [
+      "still image",
+      "sequence",
+      "video"
+     ],
+     {
+      "default": "sequence"
+     }
+    ],
+    "filename": [
+     "STRING",
+     {
+      "default": "ocio_out",
+      "tooltip": "Base name. Numbering / extension are added automatically."
+     }
+    ],
+    "first_frame": [
+     "INT",
+     {
+      "default": 1,
+      "max": 100000000,
+      "min": 0,
+      "tooltip": "still image: WHICH frame to save - a number outside the batch is refused by name, not rounded to the nearest frame. sequence/video: first frame to write (frame numbers, auto-filled from the source, e.g. 86)."
+     }
+    ],
+    "input_colorspace": [
+     [
+      "sRGB - Display",
+      "Gamma 2.2 Rec.709 - Display",
+      "Display P3 - Display",
+      "Display P3 HDR - Display",
+      "Gamma 2.6 P3-D65 - Display",
+      "Rec.1886 Rec.709 - Display",
+      "Rec.2100-HLG - Display",
+      "Rec.2100-PQ - Display",
+      "ST2084-P3-D65 - Display",
+      "ACES2065-1",
+      "ACEScc",
+      "ACEScct",
+      "ACEScg",
+      "ADX10",
+      "ADX16",
+      "Apple Log",
+      "Apple Log 2",
+      "Linear Apple Wide Gamut",
+      "ARRI LogC3 (EI800)",
+      "Linear ARRI Wide Gamut 3",
+      "ARRI LogC4",
+      "Linear ARRI Wide Gamut 4",
+      "BMDFilm WideGamut Gen5",
+      "Linear BMD WideGamut Gen5",
+      "DaVinci Intermediate WideGamut",
+      "Linear DaVinci WideGamut",
+      "CanonLog2 CinemaGamut D55",
+      "Linear CinemaGamut D55",
+      "CanonLog3 CinemaGamut D55",
+      "D-Log D-Gamut",
+      "Linear D-Gamut",
+      "V-Log V-Gamut",
+      "Linear V-Gamut",
+      "Log3G10 REDWideGamutRGB",
+      "Linear REDWideGamutRGB",
+      "S-Log3 S-Gamut3",
+      "S-Log3 S-Gamut3.Cine",
+      "S-Log3 Venice S-Gamut3",
+      "S-Log3 Venice S-Gamut3.Cine",
+      "Linear S-Gamut3",
+      "Linear S-Gamut3.Cine",
+      "Linear Venice S-Gamut3",
+      "Linear Venice S-Gamut3.Cine",
+      "sRGB Encoded Rec.709 (sRGB)",
+      "Gamma 1.8 Encoded Rec.709",
+      "Gamma 2.2 Encoded Rec.709",
+      "Gamma 2.4 Encoded Rec.709",
+      "Camera Rec.709",
+      "sRGB Encoded P3-D65",
+      "Gamma 2.2 Encoded AdobeRGB",
+      "sRGB Encoded AP1",
+      "Gamma 2.2 Encoded AP1",
+      "Linear AdobeRGB",
+      "Linear P3-D65",
+      "Linear Rec.2020",
+      "Linear Rec.709 (sRGB)",
+      "Raw"
+     ],
+     {
+      "default": "sRGB - Display",
+      "tooltip": "Colorspace from the active OCIO (ACES) config."
+     }
+    ],
+    "last_frame": [
+     "INT",
+     {
+      "default": 0,
+      "max": 100000000,
+      "min": 0,
+      "tooltip": "sequence/video: last frame to write (0 = to the end; auto-filled from the source, e.g. 97). Ignored for a still image."
+     }
+    ],
+    "output_colorspace": [
+     [
+      "sRGB - Display",
+      "Gamma 2.2 Rec.709 - Display",
+      "Display P3 - Display",
+      "Display P3 HDR - Display",
+      "Gamma 2.6 P3-D65 - Display",
+      "Rec.1886 Rec.709 - Display",
+      "Rec.2100-HLG - Display",
+      "Rec.2100-PQ - Display",
+      "ST2084-P3-D65 - Display",
+      "ACES2065-1",
+      "ACEScc",
+      "ACEScct",
+      "ACEScg",
+      "ADX10",
+      "ADX16",
+      "Apple Log",
+      "Apple Log 2",
+      "Linear Apple Wide Gamut",
+      "ARRI LogC3 (EI800)",
+      "Linear ARRI Wide Gamut 3",
+      "ARRI LogC4",
+      "Linear ARRI Wide Gamut 4",
+      "BMDFilm WideGamut Gen5",
+      "Linear BMD WideGamut Gen5",
+      "DaVinci Intermediate WideGamut",
+      "Linear DaVinci WideGamut",
+      "CanonLog2 CinemaGamut D55",
+      "Linear CinemaGamut D55",
+      "CanonLog3 CinemaGamut D55",
+      "D-Log D-Gamut",
+      "Linear D-Gamut",
+      "V-Log V-Gamut",
+      "Linear V-Gamut",
+      "Log3G10 REDWideGamutRGB",
+      "Linear REDWideGamutRGB",
+      "S-Log3 S-Gamut3",
+      "S-Log3 S-Gamut3.Cine",
+      "S-Log3 Venice S-Gamut3",
+      "S-Log3 Venice S-Gamut3.Cine",
+      "Linear S-Gamut3",
+      "Linear S-Gamut3.Cine",
+      "Linear Venice S-Gamut3",
+      "Linear Venice S-Gamut3.Cine",
+      "sRGB Encoded Rec.709 (sRGB)",
+      "Gamma 1.8 Encoded Rec.709",
+      "Gamma 2.2 Encoded Rec.709",
+      "Gamma 2.4 Encoded Rec.709",
+      "Camera Rec.709",
+      "sRGB Encoded P3-D65",
+      "Gamma 2.2 Encoded AdobeRGB",
+      "sRGB Encoded AP1",
+      "Gamma 2.2 Encoded AP1",
+      "Linear AdobeRGB",
+      "Linear P3-D65",
+      "Linear Rec.2020",
+      "Linear Rec.709 (sRGB)",
+      "Raw"
+     ],
+     {
+      "default": "ACEScg",
+      "tooltip": "Colorspace from the active OCIO (ACES) config."
+     }
+    ],
+    "output_folder": [
+     "STRING",
+     {
+      "default": "",
+      "tooltip": "Empty = the ComfyUI output dir. Relative or $OUTPUT/sub sits under it; an absolute path is written there. PREFER relative or $OUTPUT: this value is stored in the workflow, and other nodes embed the workflow into the files they write."
+     }
+    ],
+    "profile": [
+     [
+      "none",
+      "auto",
+      "LTX 2.3 HDR",
+      "LumiPic LogC3 (Flux/Qwen)",
+      "LumiPic V10 LogC4",
+      "Seedance 4K 10-bit",
+      "SDR Rec.709 delivery"
+     ],
+     {
+      "default": "none",
+      "tooltip": "Sets from/output colorspace; the HDR presets also force EXR 16f. LTX 2.3 is for 2.3 only: it expects linear, because Lightricks' own node already undid LogC3. There is no 2.5 preset - undo 2.5's ACEScct curve with OCIO LogConvert instead. SDR Rec.709 delivery: read docs/NODES_IO.md first."
+     }
+    ],
+    "raw_data": [
+     "BOOLEAN",
+     {
+      "default": false,
+      "tooltip": "Nuke 'Raw Data': write the pixels as-is, skipping the from->out colorspace conversion. The file is also left UNTAGGED - no chromaticities on a still, no colour primaries / transfer / matrix on a movie - because unconverted pixels have no delivery space to name."
+     }
+    ],
+    "source_start": [
+     "INT",
+     {
+      "default": 1,
+      "max": 100000000,
+      "min": 0,
+      "tooltip": "(auto) the source's first frame number, used to map first_frame/last_frame to the batch. Set by the wire."
+     }
+    ],
+    "start_number": [
+     "INT",
+     {
+      "default": 1,
+      "max": 100000000,
+      "min": 0,
+      "tooltip": "OUTPUT file numbering start (auto-filled to the source's first frame, e.g. 86; set 1 for 0001..). This is the re-base, NOT retime."
+     }
+    ],
+    "still_format": [
+     [
+      "exr",
+      "tiff",
+      "png",
+      "jpeg",
+      "dpx"
+     ],
+     {
+      "default": "exr",
+      "tooltip": "Used for still image / sequence (hidden for video). EXR keeps float, so negatives and values above 1.0 survive. DPX is the film-pipeline interchange format, integer, 10 or 16 bit. TIFF is float only at 32f. PNG and JPEG are integer and clip both tails; JPEG is always 4:2:0."
+     }
+    ],
+    "video_codec": [
+     [
+      "prores_4444",
+      "prores_422hq",
+      "prores_422",
+      "dnxhr_hq",
+      "h264",
+      "hevc",
+      "dnxhr_hq_mxf",
+      "dnxhr_hq_mxf_opatom",
+      "dnxhr_hqx",
+      "dnxhr_444",
+      "prores_4444_mxf",
+      "prores_4444xq_mxf",
+      "dnxhr_hqx_mxf",
+      "dnxhr_444_mxf",
+      "hevc_444_12",
+      "prores_4444xq",
+      "ffv1"
+     ],
+     {
+      "default": "prores_4444",
+      "tooltip": "Video only. The node's footer states the depth once you pick. FFV1 is the only one that returns this pack's input unchanged (16-bit, .mkv, archival). HEVC 4:4:4 12-bit is the only genuine 12-bit encode - ffmpeg's ProRes and DNxHR encoders top out at 10 whatever the format is nominally worth. 8-bit: DNxHR HQ, h264, hevc, and those two move to 10-bit on an HDR output. Measured table: README.md."
+     }
+    ]
+   }
+  },
+  "output": [
+   "STRING"
+  ]
+ },
+ "PrimitiveInt": {
+  "input": {
+   "required": {
+    "value": [
+     "INT",
+     {
+      "control_after_generate": "fixed",
+      "max": 9223372036854775807,
+      "min": -9223372036854775807
+     }
+    ]
+   }
+  },
+  "output": [
+   "INT"
+  ]
+ },
+ "PrimitiveStringMultiline": {
+  "input": {
+   "required": {
+    "value": [
+     "STRING",
+     {
+      "multiline": true
+     }
+    ]
+   }
+  },
+  "output": [
+   "STRING"
+  ]
+ },
+ "RandomNoise": {
+  "input": {
+   "required": {
+    "noise_seed": [
+     "INT",
+     {
+      "control_after_generate": true,
+      "default": 0,
+      "max": 18446744073709551615,
+      "min": 0
+     }
+    ]
+   }
+  },
+  "output": [
+   "NOISE"
+  ]
+ },
+ "ResizeImageMaskNode": {
+  "input": {
+   "required": {
+    "input": [
+     "COMFY_MATCHTYPE_V3",
+     {
+      "template": {
+       "allowed_types": "IMAGE,MASK",
+       "template_id": "input_type"
+      }
+     }
+    ],
+    "resize_type": [
+     "COMFY_DYNAMICCOMBO_V3",
+     {
+      "options": [
+       {
+        "inputs": {
+         "required": {
+          "crop": [
+           "COMBO",
+           {
+            "default": "center",
+            "multiselect": false,
+            "options": [
+             "disabled",
+             "center"
+            ],
+            "tooltip": "How to handle aspect ratio mismatch: 'disabled' stretches to fit, 'center' crops to maintain aspect ratio."
+           }
+          ],
+          "height": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "Target height in pixels. Set to 0 to auto-calculate from width while preserving aspect ratio."
+           }
+          ],
+          "width": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "Target width in pixels. Set to 0 to auto-calculate from height while preserving aspect ratio."
+           }
+          ]
+         }
+        },
+        "key": "scale dimensions"
+       },
+       {
+        "inputs": {
+         "required": {
+          "multiplier": [
+           "FLOAT",
+           {
+            "default": 1.0,
+            "max": 8.0,
+            "min": 0.01,
+            "step": 0.01,
+            "tooltip": "Scale factor (e.g., 2.0 doubles size, 0.5 halves size)."
+           }
+          ]
+         }
+        },
+        "key": "scale by multiplier"
+       },
+       {
+        "inputs": {
+         "required": {
+          "longer_size": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "The longer edge will be resized to this value. Aspect ratio is preserved."
+           }
+          ]
+         }
+        },
+        "key": "scale longer dimension"
+       },
+       {
+        "inputs": {
+         "required": {
+          "shorter_size": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "The shorter edge will be resized to this value. Aspect ratio is preserved."
+           }
+          ]
+         }
+        },
+        "key": "scale shorter dimension"
+       },
+       {
+        "inputs": {
+         "required": {
+          "width": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "Target width in pixels. Height auto-adjusts to preserve aspect ratio."
+           }
+          ]
+         }
+        },
+        "key": "scale width"
+       },
+       {
+        "inputs": {
+         "required": {
+          "height": [
+           "INT",
+           {
+            "default": 512,
+            "max": 16384,
+            "min": 0,
+            "step": 1,
+            "tooltip": "Target height in pixels. Width auto-adjusts to preserve aspect ratio."
+           }
+          ]
+         }
+        },
+        "key": "scale height"
+       },
+       {
+        "inputs": {
+         "required": {
+          "megapixels": [
+           "FLOAT",
+           {
+            "default": 1.0,
+            "max": 16.0,
+            "min": 0.01,
+            "step": 0.01,
+            "tooltip": "Target total megapixels (e.g., 1.0 \u2248 1024\u00d71024). Aspect ratio is preserved."
+           }
+          ]
+         }
+        },
+        "key": "scale total pixels"
+       },
+       {
+        "inputs": {
+         "required": {
+          "crop": [
+           "COMBO",
+           {
+            "default": "center",
+            "multiselect": false,
+            "options": [
+             "disabled",
+             "center"
+            ],
+            "tooltip": "How to handle aspect ratio mismatch: 'disabled' stretches to fit, 'center' crops to maintain aspect ratio."
+           }
+          ],
+          "match": [
+           "IMAGE,MASK",
+           {
+            "tooltip": "Resize input to match the dimensions of this reference image or mask."
+           }
+          ]
+         }
+        },
+        "key": "match size"
+       },
+       {
+        "inputs": {
+         "required": {
+          "multiple": [
+           "INT",
+           {
+            "default": 8,
+            "max": 16384,
+            "min": 1,
+            "step": 1,
+            "tooltip": "Resize so width and height are divisible by this number. Useful for latent alignment (e.g., 8 or 64)."
+           }
+          ]
+         }
+        },
+        "key": "scale to multiple"
+       }
+      ],
+      "tooltip": "Select how to resize: by exact dimensions, scale factor, matching another image, etc."
+     }
+    ],
+    "scale_method": [
+     "COMBO",
+     {
+      "default": "area",
+      "multiselect": false,
+      "options": [
+       "nearest-exact",
+       "bilinear",
+       "area",
+       "bicubic",
+       "lanczos"
+      ],
+      "tooltip": "Interpolation algorithm. 'area' is best for downscaling, 'lanczos' for upscaling, 'nearest-exact' for pixel art."
+     }
+    ]
+   }
+  },
+  "output": [
+   "COMFY_MATCHTYPE_V3"
+  ]
+ },
+ "SAM3BBoxCollector": {
+  "input": {
+   "hidden": {
+    "extra_pnginfo": [
+     "EXTRA_PNGINFO"
+    ],
+    "prompt": [
+     "PROMPT"
+    ]
+   },
+   "required": {
+    "bboxes": [
+     "STRING",
+     {
+      "default": "[]",
+      "multiline": false
+     }
+    ],
+    "image": [
+     "IMAGE",
+     {
+      "tooltip": "Image to display in interactive canvas. Click and drag to draw positive bboxes (cyan), Shift+Click/Right-click and drag to draw negative bboxes (red). Bounding boxes are automatically normalized to image dimensions."
+     }
+    ],
+    "neg_bboxes": [
+     "STRING",
+     {
+      "default": "[]",
+      "multiline": false
+     }
+    ]
+   }
+  },
+  "output": [
+   "SAM3_BOXES_PROMPT",
+   "SAM3_BOXES_PROMPT"
+  ]
+ },
+ "SAM3PointCollector": {
+  "input": {
+   "hidden": {
+    "extra_pnginfo": [
+     "EXTRA_PNGINFO"
+    ],
+    "prompt": [
+     "PROMPT"
+    ]
+   },
+   "required": {
+    "coordinates": [
+     "STRING",
+     {
+      "default": "[]",
+      "multiline": false
+     }
+    ],
+    "image": [
+     "IMAGE",
+     {
+      "tooltip": "Image to display in interactive canvas. Left-click to add positive points (green), Shift+Left-click or Right-click to add negative points (red). Points are automatically normalized to image dimensions."
+     }
+    ],
+    "neg_coordinates": [
+     "STRING",
+     {
+      "default": "[]",
+      "multiline": false
+     }
+    ],
+    "points_store": [
+     "STRING",
+     {
+      "default": "{}",
+      "multiline": false
+     }
+    ]
+   }
+  },
+  "output": [
+   "SAM3_POINTS_PROMPT",
+   "SAM3_POINTS_PROMPT"
+  ]
+ },
+ "SAM3Propagate": {
+  "input": {
+   "optional": {
+    "direction": [
+     "COMBO",
+     {
+      "default": "forward",
+      "multiselect": false,
+      "options": [
+       "forward",
+       "backward",
+       "both"
+      ],
+      "tooltip": "Propagation direction: forward (future frames), backward (past frames), or both directions"
+     }
+    ],
+    "end_frame": [
+     "INT",
+     {
+      "default": -1,
+      "min": -1,
+      "tooltip": "End frame (-1 for all)"
+     }
+    ],
+    "start_frame": [
+     "INT",
+     {
+      "default": 0,
+      "min": 0,
+      "tooltip": "Start frame for propagation"
+     }
+    ]
+   },
+   "required": {
+    "sam3_model_config": [
+     "SAM3_MODEL_CONFIG",
+     {
+      "tooltip": "SAM3 model config (from LoadSAM3Model)"
+     }
+    ],
+    "video_state": [
+     "SAM3_VIDEO_STATE",
+     {
+      "tooltip": "Video state with prompts"
+     }
+    ]
+   }
+  },
+  "output": [
+   "SAM3_VIDEO_MASKS",
+   "SAM3_VIDEO_SCORES",
+   "SAM3_VIDEO_STATE"
+  ]
+ },
+ "SAM3VideoOutput": {
+  "input": {
+   "optional": {
+    "obj_id": [
+     "INT",
+     {
+      "default": -1,
+      "min": -1,
+      "tooltip": "Specific object ID for mask output (-1 for all combined). Changing this is fast - no re-inference needed."
+     }
+    ],
+    "plot_all_masks": [
+     "BOOLEAN",
+     {
+      "default": true,
+      "tooltip": "Show all object masks in visualization (True) or only selected obj_id (False)"
+     }
+    ],
+    "scores": [
+     "SAM3_VIDEO_SCORES",
+     {
+      "tooltip": "Confidence scores from SAM3Propagate"
+     }
+    ]
+   },
+   "required": {
+    "masks": [
+     "SAM3_VIDEO_MASKS",
+     {
+      "tooltip": "Masks from SAM3Propagate"
+     }
+    ],
+    "video_state": [
+     "SAM3_VIDEO_STATE",
+     {
+      "tooltip": "Video state for dimensions"
+     }
+    ]
+   }
+  },
+  "output": [
+   "MASK",
+   "IMAGE",
+   "IMAGE"
+  ]
+ },
+ "SAM3VideoSegmentation": {
+  "input": {
+   "optional": {
+    "frame_idx": [
+     "INT",
+     {
+      "default": 0,
+      "min": 0,
+      "tooltip": "Frame index to apply prompts (usually 0 for first frame)"
+     }
+    ],
+    "negative_boxes": [
+     "SAM3_BOXES_PROMPT",
+     {
+      "tooltip": "[box mode] Negative boxes - draw around areas to exclude"
+     }
+    ],
+    "negative_points": [
+     "SAM3_POINTS_PROMPT",
+     {
+      "tooltip": "[point mode] Negative points - click on areas to exclude"
+     }
+    ],
+    "positive_boxes": [
+     "SAM3_BOXES_PROMPT",
+     {
+      "tooltip": "[box mode] Positive boxes - draw around objects to track"
+     }
+    ],
+    "positive_points": [
+     "SAM3_POINTS_PROMPT",
+     {
+      "tooltip": "[point mode] Positive points - click on objects to track"
+     }
+    ],
+    "score_threshold": [
+     "FLOAT",
+     {
+      "default": 0.3,
+      "max": 1.0,
+      "min": 0.0,
+      "step": 0.05,
+      "tooltip": "Detection confidence threshold"
+     }
+    ],
+    "text_prompt": [
+     "STRING",
+     {
+      "default": "",
+      "multiline": false,
+      "tooltip": "[text mode] Text description(s) to track. Comma-separated for multiple objects (e.g., 'person, dog, car')"
+     }
+    ],
+    "video": [
+     "VIDEO",
+     {
+      "tooltip": "Video from ComfyUI Load Video node. Memory-efficient: frames extracted one at a time without loading entire video into RAM. Takes priority over video_frames if both connected."
+     }
+    ],
+    "video_frames": [
+     "IMAGE",
+     {
+      "tooltip": "Video frames as batch of images [N, H, W, C]"
+     }
+    ]
+   },
+   "required": {
+    "prompt_mode": [
+     "COMBO",
+     {
+      "default": "text",
+      "multiselect": false,
+      "options": [
+       "text",
+       "point",
+       "box"
+      ],
+      "tooltip": "Prompt type: text (describe objects), point (click on objects), or box (draw rectangles)"
+     }
+    ]
+   }
+  },
+  "output": [
+   "SAM3_VIDEO_STATE"
+  ]
+ },
+ "SamplerCustomAdvanced": {
+  "input": {
+   "required": {
+    "guider": [
+     "GUIDER",
+     {}
+    ],
+    "latent_image": [
+     "LATENT",
+     {}
+    ],
+    "noise": [
+     "NOISE",
+     {}
+    ],
+    "sampler": [
+     "SAMPLER",
+     {}
+    ],
+    "sigmas": [
+     "SIGMAS",
+     {}
+    ]
+   }
+  },
+  "output": [
+   "LATENT",
+   "LATENT"
+  ]
+ },
+ "StringContains": {
+  "input": {
+   "required": {
+    "case_sensitive": [
+     "BOOLEAN",
+     {
+      "advanced": true,
+      "default": true
+     }
+    ],
+    "string": [
+     "STRING",
+     {
+      "multiline": true
+     }
+    ],
+    "substring": [
+     "STRING",
+     {
+      "multiline": true
+     }
+    ]
+   }
+  },
+  "output": [
+   "BOOLEAN"
+  ]
+ },
+ "TextGenerateLTX2Prompt": {
+  "input": {
+   "optional": {
+    "audio": [
+     "AUDIO",
+     {}
+    ],
+    "image": [
+     "IMAGE",
+     {}
+    ],
+    "mtp": [
+     "COMBO",
+     {
+      "default": "auto",
+      "multiselect": false,
+      "options": [
+       "auto",
+       "off",
+       "2",
+       "3",
+       "4",
+       "5",
+       "tree2s1",
+       "tree2s2",
+       "tree3s1",
+       "tree4s1m8"
+      ],
+      "tooltip": "Speculative decoding with the checkpoint's multi-token-prediction head. No effect without MTP weights. auto adapts the draft depth and breadth to observed token matches and execution cost; 2-5 pins a constant draft depth; tree modes pin both breadth and depth. Sampled output stays correctly distributed but differs from non-MTP output for the same seed."
+     }
+    ],
+    "system_prompt": [
+     "STRING",
+     {
+      "forceInput": true,
+      "multiline": false,
+      "tooltip": "Replaces the system prompt in the model's chat template. Ignored when the default template is not used."
+     }
+    ],
+    "thinking": [
+     "BOOLEAN",
+     {
+      "default": false,
+      "tooltip": "Operate in thinking mode if the model supports it."
+     }
+    ],
+    "use_default_template": [
+     "BOOLEAN",
+     {
+      "advanced": true,
+      "default": true,
+      "tooltip": "Use the built in system prompt/template if the model has one."
+     }
+    ],
+    "video": [
+     "IMAGE",
+     {
+      "tooltip": "Video frames as image batch. Assumed to be 24 FPS; subsampled to 1 FPS internally."
+     }
+    ]
+   },
+   "required": {
+    "clip": [
+     "CLIP",
+     {}
+    ],
+    "max_length": [
+     "INT",
+     {
+      "default": 512,
+      "max": 32768,
+      "min": 1
+     }
+    ],
+    "prompt": [
+     "STRING",
+     {
+      "default": "",
+      "dynamicPrompts": true,
+      "multiline": true
+     }
+    ],
+    "sampling_mode": [
+     "COMFY_DYNAMICCOMBO_V3",
+     {
+      "display_name": "Sampling Mode",
+      "options": [
+       {
+        "inputs": {
+         "optional": {
+          "presence_penalty": [
+           "FLOAT",
+           {
+            "default": 0.0,
+            "max": 5.0,
+            "min": 0.0,
+            "step": 0.01
+           }
+          ]
+         },
+         "required": {
+          "min_p": [
+           "FLOAT",
+           {
+            "default": 0.05,
+            "max": 1.0,
+            "min": 0.0,
+            "step": 0.01
+           }
+          ],
+          "repetition_penalty": [
+           "FLOAT",
+           {
+            "default": 1.05,
+            "max": 5.0,
+            "min": 0.0,
+            "step": 0.01
+           }
+          ],
+          "seed": [
+           "INT",
+           {
+            "default": 0,
+            "max": 18446744073709551615,
+            "min": 0
+           }
+          ],
+          "temperature": [
+           "FLOAT",
+           {
+            "default": 0.7,
+            "max": 2.0,
+            "min": 0.01,
+            "step": 1e-06
+           }
+          ],
+          "top_k": [
+           "INT",
+           {
+            "default": 64,
+            "max": 1000,
+            "min": 0
+           }
+          ],
+          "top_p": [
+           "FLOAT",
+           {
+            "default": 0.95,
+            "max": 1.0,
+            "min": 0.0,
+            "step": 0.01
+           }
+          ]
+         }
+        },
+        "key": "on"
+       },
+       {
+        "inputs": {
+         "required": {}
+        },
+        "key": "off"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "output": [
+   "STRING",
+   "STRING"
+  ]
+ },
+ "UNETLoader": {
+  "input": {
+   "required": {
+    "unet_name": [
+     [
+      "ltx-2.5-22b-distilled-transformer-bf16.safetensors"
+     ]
+    ],
+    "weight_dtype": [
+     [
+      "default",
+      "fp8_e4m3fn",
+      "fp8_e4m3fn_fast",
+      "fp8_e5m2"
+     ],
+     {
+      "advanced": true
+     }
+    ]
+   }
+  },
+  "output": [
+   "MODEL"
+  ]
+ },
+ "VAEDecodeTiled": {
+  "input": {
+   "required": {
+    "overlap": [
+     "INT",
+     {
+      "advanced": true,
+      "default": 64,
+      "max": 4096,
+      "min": 0,
+      "step": 32
+     }
+    ],
+    "samples": [
+     "LATENT"
+    ],
+    "temporal_overlap": [
+     "INT",
+     {
+      "advanced": true,
+      "default": 8,
+      "max": 4096,
+      "min": 4,
+      "step": 4,
+      "tooltip": "Only used for video VAEs: Amount of frames to overlap."
+     }
+    ],
+    "temporal_size": [
+     "INT",
+     {
+      "advanced": true,
+      "default": 64,
+      "max": 4096,
+      "min": 8,
+      "step": 4,
+      "tooltip": "Only used for video VAEs: Amount of frames to decode at a time."
+     }
+    ],
+    "tile_size": [
+     "INT",
+     {
+      "advanced": true,
+      "default": 512,
+      "max": 4096,
+      "min": 64,
+      "step": 32
+     }
+    ],
+    "vae": [
+     "VAE"
+    ]
+   }
+  },
+  "output": [
+   "IMAGE"
+  ]
+ },
+ "VAELoader": {
+  "input": {
+   "required": {
+    "vae_name": [
+     [
+      "ltx-2.5-audio-vae-bf16.safetensors",
+      "ltx-2.5-video-vae-bf16.safetensors"
+     ]
+    ]
+   }
+  },
+  "output": [
+   "VAE"
+  ]
+ },
+ "VHS_LoadVideo": {
+  "input": {
+   "hidden": {
+    "force_size": "STRING",
+    "unique_id": "UNIQUE_ID"
+   },
+   "optional": {
+    "format": [
+     [
+      "None",
+      "AnimateDiff",
+      "Mochi",
+      "LTXV",
+      "Hunyuan",
+      "Cosmos",
+      "Wan"
+     ],
+     {
+      "default": "AnimateDiff",
+      "formats": {
+       "AnimateDiff": {
+        "dim": [
+         8,
+         0,
+         512,
+         512
+        ],
+        "target_rate": 8
+       },
+       "Cosmos": {
+        "dim": [
+         16,
+         0,
+         1280,
+         704
+        ],
+        "frames": [
+         8,
+         1
+        ],
+        "target_rate": 24
+       },
+       "Hunyuan": {
+        "dim": [
+         16,
+         0,
+         848,
+         480
+        ],
+        "frames": [
+         4,
+         1
+        ],
+        "target_rate": 24
+       },
+       "LTXV": {
+        "dim": [
+         32,
+         0,
+         768,
+         512
+        ],
+        "frames": [
+         8,
+         1
+        ],
+        "target_rate": 24
+       },
+       "Mochi": {
+        "dim": [
+         16,
+         0,
+         848,
+         480
+        ],
+        "frames": [
+         6,
+         1
+        ],
+        "target_rate": 24
+       },
+       "None": {},
+       "Wan": {
+        "dim": [
+         8,
+         0,
+         832,
+         480
+        ],
+        "frames": [
+         4,
+         1
+        ],
+        "target_rate": 16
+       }
+      }
+     }
+    ],
+    "meta_batch": [
+     "VHS_BatchManager"
+    ],
+    "vae": [
+     "VAE"
+    ]
+   },
+   "required": {
+    "custom_height": [
+     "INT",
+     {
+      "default": 0,
+      "disable": 0,
+      "max": 8192,
+      "min": 0
+     }
+    ],
+    "custom_width": [
+     "INT",
+     {
+      "default": 0,
+      "disable": 0,
+      "max": 8192,
+      "min": 0
+     }
+    ],
+    "force_rate": [
+     "FLOAT",
+     {
+      "default": 0,
+      "disable": 0,
+      "max": 60,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "frame_load_cap": [
+     "INT",
+     {
+      "default": 0,
+      "disable": 0,
+      "max": 9007199254740991,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "select_every_nth": [
+     "INT",
+     {
+      "default": 1,
+      "max": 9007199254740991,
+      "min": 1,
+      "step": 1
+     }
+    ],
+    "skip_first_frames": [
+     "INT",
+     {
+      "default": 0,
+      "max": 9007199254740991,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "video": [
+     [
+      "plate.mp4"
+     ]
+    ]
+   }
+  },
+  "output": [
+   "IMAGE",
+   "INT",
+   "AUDIO",
+   "VHS_VIDEOINFO"
+  ]
+ },
+ "VHS_VideoCombine": {
+  "input": {
+   "hidden": {
+    "extra_pnginfo": "EXTRA_PNGINFO",
+    "prompt": "PROMPT",
+    "unique_id": "UNIQUE_ID"
+   },
+   "optional": {
+    "audio": [
+     "AUDIO"
+    ],
+    "meta_batch": [
+     "VHS_BatchManager"
+    ],
+    "vae": [
+     "VAE"
+    ]
+   },
+   "required": {
+    "filename_prefix": [
+     "STRING",
+     {
+      "default": "AnimateDiff"
+     }
+    ],
+    "format": [
+     [
+      "image/gif",
+      "image/webp",
+      "video/16bit-png",
+      "video/8bit-png",
+      "video/av1-webm",
+      "video/ffmpeg-gif",
+      "video/ffv1-mkv",
+      "video/h264-mp4",
+      "video/h265-mp4",
+      "video/nvenc_av1-mp4",
+      "video/nvenc_h264-mp4",
+      "video/nvenc_hevc-mp4",
+      "video/ProRes",
+      "video/webm"
+     ],
+     {
+      "formats": {
+       "image/webp": [
+        [
+         "lossless",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/ProRes": [
+        [
+         "profile",
+         [
+          "lt",
+          "standard",
+          "hq",
+          "4444",
+          "4444xq"
+         ],
+         {
+          "default": "hq"
+         }
+        ]
+       ],
+       "video/av1-webm": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p10le",
+          "yuv420p"
+         ]
+        ],
+        [
+         "crf",
+         "INT",
+         {
+          "default": 23,
+          "max": 100,
+          "min": 0,
+          "step": 1
+         }
+        ],
+        [
+         "input_color_depth",
+         [
+          "8bit",
+          "16bit"
+         ]
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/ffmpeg-gif": [
+        [
+         "dither",
+         [
+          "bayer",
+          "heckbert",
+          "floyd_steinberg",
+          "sierra2",
+          "sierra2_4a",
+          "sierra3",
+          "burkes",
+          "atkinson",
+          "none"
+         ],
+         {
+          "default": "sierra2_4a"
+         },
+         "[0:v] split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse=dither=$val"
+        ]
+       ],
+       "video/ffv1-mkv": [
+        [
+         "level",
+         [
+          "0",
+          "1",
+          "3"
+         ],
+         {
+          "default": "3"
+         }
+        ],
+        [
+         "coder",
+         [
+          "0",
+          "1",
+          "2"
+         ],
+         {
+          "default": "1"
+         }
+        ],
+        [
+         "context",
+         [
+          "0",
+          "1"
+         ],
+         {
+          "default": "1"
+         }
+        ],
+        [
+         "gop_size",
+         "INT",
+         {
+          "default": 1,
+          "max": 300,
+          "min": 1,
+          "step": 1
+         }
+        ],
+        [
+         "slices",
+         [
+          "4",
+          "6",
+          "9",
+          "12",
+          "16",
+          "20",
+          "24",
+          "30"
+         ],
+         {
+          "default": "16"
+         }
+        ],
+        [
+         "slicecrc",
+         [
+          "0",
+          "1"
+         ],
+         {
+          "default": "1"
+         }
+        ],
+        [
+         "pix_fmt",
+         [
+          "rgba64le",
+          "bgra",
+          "yuv420p",
+          "yuv422p",
+          "yuv444p",
+          "yuva420p",
+          "yuva422p",
+          "yuva444p",
+          "yuv420p10le",
+          "yuv422p10le",
+          "yuv444p10le",
+          "yuv420p12le",
+          "yuv422p12le",
+          "yuv444p12le",
+          "yuv420p14le",
+          "yuv422p14le",
+          "yuv444p14le",
+          "yuv420p16le",
+          "yuv422p16le",
+          "yuv444p16le",
+          "gray",
+          "gray10le",
+          "gray12le",
+          "gray16le"
+         ],
+         {
+          "default": "rgba64le"
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "trim_to_audio",
+         "BOOLEAN",
+         {
+          "default": false
+         }
+        ]
+       ],
+       "video/h264-mp4": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p",
+          "yuv420p10le"
+         ]
+        ],
+        [
+         "crf",
+         "INT",
+         {
+          "default": 19,
+          "max": 100,
+          "min": 0,
+          "step": 1
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "trim_to_audio",
+         "BOOLEAN",
+         {
+          "default": false
+         }
+        ]
+       ],
+       "video/h265-mp4": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p10le",
+          "yuv420p"
+         ]
+        ],
+        [
+         "crf",
+         "INT",
+         {
+          "default": 22,
+          "max": 100,
+          "min": 0,
+          "step": 1
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/nvenc_av1-mp4": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p",
+          "p010le"
+         ]
+        ],
+        [
+         "bitrate",
+         "INT",
+         {
+          "default": 10,
+          "max": 999,
+          "min": 1,
+          "step": 1
+         }
+        ],
+        [
+         "megabit",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/nvenc_h264-mp4": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p",
+          "p010le"
+         ]
+        ],
+        [
+         "bitrate",
+         "INT",
+         {
+          "default": 10,
+          "max": 999,
+          "min": 1,
+          "step": 1
+         }
+        ],
+        [
+         "megabit",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/nvenc_hevc-mp4": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p",
+          "p010le"
+         ]
+        ],
+        [
+         "bitrate",
+         "INT",
+         {
+          "default": 10,
+          "max": 999,
+          "min": 1,
+          "step": 1
+         }
+        ],
+        [
+         "megabit",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ]
+       ],
+       "video/webm": [
+        [
+         "pix_fmt",
+         [
+          "yuv420p",
+          "yuva420p"
+         ]
+        ],
+        [
+         "crf",
+         "INT",
+         {
+          "default": 20,
+          "max": 100,
+          "min": 0,
+          "step": 1
+         }
+        ],
+        [
+         "save_metadata",
+         "BOOLEAN",
+         {
+          "default": true
+         }
+        ],
+        [
+         "trim_to_audio",
+         "BOOLEAN",
+         {
+          "default": false
+         }
+        ]
+       ]
+      }
+     }
+    ],
+    "frame_rate": [
+     "FLOAT",
+     {
+      "default": 8,
+      "min": 1,
+      "step": 1
+     }
+    ],
+    "images": [
+     "IMAGE"
+    ],
+    "loop_count": [
+     "INT",
+     {
+      "default": 0,
+      "max": 100,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "pingpong": [
+     "BOOLEAN",
+     {
+      "default": false
+     }
+    ],
+    "save_output": [
+     "BOOLEAN",
+     {
+      "default": true
+     }
+    ]
+   }
+  },
+  "output": [
+   "VHS_FILENAMES"
+  ]
+ },
+ "VHS_VideoInfo": {
+  "input": {
+   "required": {
+    "video_info": [
+     "VHS_VIDEOINFO"
+    ]
+   }
+  },
+  "output": [
+   "FLOAT",
+   "INT",
+   "FLOAT",
+   "INT",
+   "INT",
+   "FLOAT",
+   "INT",
+   "FLOAT",
+   "INT",
+   "INT"
+  ]
+ }
+}
