@@ -391,7 +391,23 @@ def run(context, host, folder, settings, export, stop):
                 client.download(host, item, sheet)
             publish(context, "Complete", result={"matte": first_exr, "sheet": sheet}, terminal=True)
     except Exception as error:  # every failure ends as a readable status on the node
-        publish(context, f"Error: {error}", terminal=True)
+        publish(context, f"Error: {explain(error, kind, settings)}", terminal=True)
+
+
+def explain(error, kind, settings):
+    """Turn a GPU out-of-memory error into what to change; other errors pass through as they are."""
+    text = str(error)
+    if "out of memory" not in text.lower() and "allocation on device" not in text.lower():
+        return text
+    first_line = text.splitlines()[0]
+    if kind == "select":
+        return ("SAM3 ran out of GPU memory. It tracks every match as a separate object through the whole range, "
+                "so a word that matches a crowd (human, person, spectator in a full stand) can need more memory "
+                "than the card has.\n\nTry: a narrower word, a higher Detect threshold, Box around the part you "
+                "want, or a shorter frame range.\n\n" + first_line)
+    size = "x".join(map(str, settings["size"]))
+    return (f"LTX ran out of GPU memory at {size}, {settings['frames']} frames.\n\n"
+            "Try: a smaller Size (the arrows), or a shorter frame range.\n\n" + first_line)
 
 
 def build(settings, uploaded, exr_folder, colorspaces):

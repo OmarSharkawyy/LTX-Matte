@@ -133,6 +133,16 @@ def validator_test():
         assert text in found, (text, found)
 
 
+def message_test():
+    from ltx_matte import bridge
+    oom = RuntimeError("Allocation on device 0 would exceed allowed memory. (out of memory)\nCurrently allocated : 4.8 GiB")
+    select = bridge.explain(oom, "select", {"size": (1280, 704), "frames": 9})
+    assert "crowd" in select and "Detect threshold" in select and "Box" in select
+    matte = bridge.explain(oom, "matte", {"size": (1280, 704), "frames": 25})
+    assert "1280x704, 25 frames" in matte and "smaller Size" in matte
+    assert bridge.explain(RuntimeError("HTTP 400"), "select", {}) == "HTTP 400"
+
+
 def package_test():
     gizmo = (ROOT / "LTXMatte.gizmo").read_text(encoding="utf-8")
     assert gizmo.startswith("Gizmo {") and "selected true" not in gizmo
@@ -151,7 +161,7 @@ def package_test():
 
 def main():
     for name, step in (("frame and size rules", rules_test), ("matte job", prompt_test),
-                       ("subject selection", selection_test), ("workflow checker", validator_test),
+                       ("subject selection", selection_test), ("workflow checker", validator_test), ("error messages", message_test),
                        ("gizmo and menu", package_test)):
         step()
         print(f"ok     {name}")

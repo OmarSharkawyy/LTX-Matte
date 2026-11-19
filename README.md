@@ -105,6 +105,7 @@ Lightricks trains Alpha Gen with an empty prompt, so the Positive and Negative p
 | LTX Matte is missing from Nuke | `menu.py` and `LTXMatte.gizmo` must be directly inside `.nuke/LTX-Matte-main`, and the `init.py` line must point at that folder. Restart Nuke. |
 | Check Setup lists missing nodes or models | Install the custom nodes and models above in the ComfyUI that the URL points at, and restart ComfyUI. |
 | Subject selection is not available | ComfyUI-SAM3 is not installed on that server. Auto and Roto still work. |
+| Find Subject stops with "ran out of GPU memory" | SAM3 tracks every match as its own object. A word that matches a crowd (human, person, spectator in a full stand) can need more memory than the card has: on a 12 GB card, `human` on a full arena needed about 18 GB. Use a narrower word, a higher **Detect threshold**, a **Box** around the part you want, or fewer frames. |
 | Find Subject picks the wrong object | Use more words (`doll in red hat`), switch to Click and add a **Not this** point, or draw a Box. |
 | Queue Matte asks for Find Subject first | The subject, frame range or size changed since the last Find Subject. Run it again. |
 | Edges are cut off | Raise **Isolate margin** and **Clean margin**, then queue a new version. |
