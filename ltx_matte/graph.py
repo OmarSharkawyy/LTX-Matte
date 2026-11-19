@@ -195,7 +195,9 @@ def build_prompt(plate, frames, fps, size, seed, positive, negative, models, job
     for node in VIEWER_ONLY:
         prompt.pop(node, None)
     load = prompt[LOAD_VIDEO]["inputs"]
-    load.update(video=plate, force_rate=float(fps), frame_load_cap=frames, skip_first_frames=0,
+    # force_rate 0 loads every frame as it is. Any other value makes VideoHelperSuite resample by time,
+    # which drops or repeats frames whenever it differs from the clip's own rate (23.976 against 24).
+    load.update(video=plate, force_rate=0, frame_load_cap=frames, skip_first_frames=0,
                 select_every_nth=1, custom_width=0, custom_height=0)
     prompt[FRAME_LIMIT]["inputs"]["value"] = frames
     shorter = min(width, height)
@@ -231,7 +233,7 @@ def build_select_prompt(plate, frames, fps, size, selection, exr_folder, colorsp
     width, height = size
     full = template()
     prompt = {node: full[node] for node in (LOAD_VIDEO, FRAME_LIMIT, PLATE_IMAGES[0])}
-    prompt[LOAD_VIDEO]["inputs"].update(video=plate, force_rate=float(fps), frame_load_cap=frames,
+    prompt[LOAD_VIDEO]["inputs"].update(video=plate, force_rate=0, frame_load_cap=frames,
                                         skip_first_frames=0, select_every_nth=1, custom_width=0, custom_height=0)
     prompt[FRAME_LIMIT]["inputs"]["value"] = frames
     resize = prompt[PLATE_IMAGES[0]]["inputs"]

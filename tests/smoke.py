@@ -53,7 +53,9 @@ def prompt_test():
     assert "9089" not in prompt, "an unused LoadImage is pruned, so a missing file cannot fail the job"
     load = prompt[graph.LOAD_VIDEO]["inputs"]
     assert (load["video"], load["frame_load_cap"], load["skip_first_frames"], load["force_rate"]) == (
-        "plate_up.mp4", 25, 0, 23.976)
+        "plate_up.mp4", 25, 0, 0), "force_rate 0: every frame loaded as it is, never resampled"
+    select = graph.build_select_prompt("plate_up.mp4", 25, 23.976, (1280, 704), {"mode": "Text", "text": "x"}, "x")
+    assert select[graph.LOAD_VIDEO]["inputs"]["force_rate"] == 0
     assert prompt[graph.FRAME_LIMIT]["inputs"]["value"] == 25
     for node in graph.RESIZE_NODES:
         assert prompt[node]["inputs"]["resize_type.shorter_size"] == 704, "the plate keeps its render size"

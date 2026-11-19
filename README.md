@@ -56,7 +56,7 @@ A puppet on a green screen, held on rods by three puppeteers whose hands touch i
 
 ## Use
 
-1. Connect the **Plate**. Click **Use Plate Range**, or set **First** and **Last**. LTX takes 9, 17, 25 ... up to 145 frames; a longer range is trimmed.
+1. Connect the **Plate**. Click **Use Plate Range**, or set **First** and **Last**. LTX takes 9, 17, 25 ... up to 145 frames; a longer range is trimmed. The plate's own frame rate is used (23.976 stays 23.976 in a 24 fps project), and every frame is sent and loaded as it is, never resampled, so the matte lines up frame for frame.
 2. Choose how to **Select** the subject:
 
    | Select | How |

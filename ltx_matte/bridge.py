@@ -89,6 +89,16 @@ def step_size_up(node):
     step_size(node, 1)
 
 
+def plate_fps(node):
+    """The plate's own frame rate, such as 23.976, or the project's when the plate does not say."""
+    plate = node.input(0)
+    try:
+        rate = float((plate.metadata() or {}).get("input/frame_rate") or 0) if plate is not None else 0
+    except (TypeError, ValueError, RuntimeError):
+        rate = 0
+    return rate if 1 <= rate <= 240 else float(nuke.root()["fps"].value())
+
+
 def plate_format(node):
     plate = node.input(0)
     if plate is None:
@@ -256,7 +266,7 @@ def start(node, kind):
         mode = node["select_mode"].value()
         chosen = selection(node, size, first, last)
         seed = parse_seed(node["seed_text"].value())
-        fps = float(nuke.root()["fps"].value())
+        fps = plate_fps(node)
         host = valid_host(node["server"].value())
         comfy_root = node_portable_root(node, host)
         ffmpeg = node_ffmpeg(node, comfy_root, host)
