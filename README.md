@@ -6,7 +6,7 @@ Made by [Omar El Sharkawy](https://github.com/OmarSharkawyy).
 
 | Gizmo | What it does |
 | --- | --- |
-| **LTX Matte** | Finds the subject you choose with SAM3, isolates it, and renders its alpha matte with LTX-2.5 Alpha Gen, then brings the matte back onto the plate as a premultiplied RGBA. |
+| **LTX Matte** | Finds the subject you choose with SAM3, isolates it, and renders its alpha matte with LTX-2.5 Alpha Gen, then brings the matte back onto the plate as a premultiplied RGBA. For crowds, **Crowd** mode mattes everyone that matches straight from SAM3. |
 
 ## How it picks one subject
 
@@ -26,7 +26,7 @@ A puppet on a green screen, held on rods by three puppeteers whose hands touch i
 ## Requirements
 
 - **Nuke on Windows.** Developed against **Nuke 16.0v5**.
-- **ComfyUI** with these custom nodes: [ComfyUI-LTXVideo](https://github.com/Lightricks/ComfyUI-LTXVideo), [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite), [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes), [ComfyUI-OCIO](https://github.com/SlavaSexton/ComfyUI-OCIO) for the EXR frames, and [ComfyUI-SAM3](https://github.com/PozzettiAndrea/ComfyUI-SAM3) for choosing a subject. Without SAM3, the Auto and Roto modes still work.
+- **ComfyUI** with these custom nodes: [ComfyUI-LTXVideo](https://github.com/Lightricks/ComfyUI-LTXVideo), [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite), [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes), [ComfyUI-OCIO](https://github.com/SlavaSexton/ComfyUI-OCIO) for the EXR frames, and [ComfyUI-SAM3](https://github.com/PozzettiAndrea/ComfyUI-SAM3) for choosing a subject. **Crowd** uses the SAM3 Segment node from [ComfyUI-RMBG](https://github.com/1038lab/ComfyUI-RMBG). Without SAM3, the Auto and Roto modes still work.
 - **Models**, under `ComfyUI/models`:
 
 | Field | File | Folder |
@@ -66,6 +66,7 @@ A puppet on a green screen, held on rods by three puppeteers whose hands touch i
    | **Box** | Drag the **Box** around the subject in the Viewer on the **On frame** frame. |
    | **Roto** | Connect your own Roto or mask to the second input, **Roto**. No Find Subject step. |
    | **Auto** | No selection: LTX mattes whatever it sees as foreground. |
+   | **Crowd** | Type what to find, such as `human`, and click **Find Subject**. Every match is found on each frame on its own, and that mask is the matte: no **Queue Matte**, no LTX. For crowds and small, distant people, where tracking each one runs out of memory and LTX adds no detail. **Crowd softness** softens its edge. |
 
 3. Click **Find Subject** (Text, Click, Box). **Detect threshold** (0.15) is how sure SAM3 must be: lower it when part of the subject is missing, raise it when other things get picked too. On the test shot, 0.3 (SAM3's own default) missed the toy chainsaw, 0.15 found it, and 0.1 also took a puppeteer as "doll". When it finishes, **View** switches to **Subject**: the subject is bright and the rest of the plate dimmed. If it picked the wrong thing, change the word, the points or the box and find it again.
 4. Click **Queue Matte**. **View** → **Isolated** shows what LTX receives. When the matte is back, **View** switches to **Final**: the plate with the matte as alpha, premultiplied.
@@ -105,6 +106,7 @@ Lightricks trains Alpha Gen with an empty prompt, so the Positive and Negative p
 | LTX Matte is missing from Nuke | `menu.py` and `LTXMatte.gizmo` must be directly inside `.nuke/LTX-Matte-main`, and the `init.py` line must point at that folder. Restart Nuke. |
 | Check Setup lists missing nodes or models | Install the custom nodes and models above in the ComfyUI that the URL points at, and restart ComfyUI. |
 | Subject selection is not available | ComfyUI-SAM3 is not installed on that server. Auto and Roto still work. |
+| Find Subject stops with "ran out of GPU memory" on a crowd | Switch **Select** to **Crowd**, which finds matches frame by frame instead of tracking each one: on the same arena it needed about 9 GB. |
 | Find Subject stops with "ran out of GPU memory" | SAM3 tracks every match as its own object. A word that matches a crowd (human, person, spectator in a full stand) can need more memory than the card has: on a 12 GB card, `human` on a full arena needed about 18 GB. Use a narrower word, a higher **Detect threshold**, a **Box** around the part you want, or fewer frames. |
 | Find Subject picks the wrong object | Use more words (`doll in red hat`), switch to Click and add a **Not this** point, or draw a Box. |
 | Queue Matte asks for Find Subject first | The subject, frame range or size changed since the last Find Subject. Run it again. |

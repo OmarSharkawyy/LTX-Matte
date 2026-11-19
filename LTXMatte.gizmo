@@ -11,7 +11,7 @@ Gizmo {
  plate_last 49
  addUserKnob {22 use_range l "Use Plate Range" t "Copy the connected plate's frame range, up to 145 frames." -STARTLINE T "from ltx_matte import bridge; bridge.use_plate_range(nuke.thisNode())"}
  addUserKnob {26 subject_title l "" +STARTLINE T <b>Subject</b>}
- addUserKnob {4 select_mode l Select t "Auto: LTX mattes whatever it sees as foreground. Text: type what to matte. Click: place points on it in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input." M {Auto Text Click Box Roto}}
+ addUserKnob {4 select_mode l Select t "Auto: LTX mattes whatever it sees as foreground. Text: type what to matte. Click: place points on it in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input. Crowd: find every match on each frame (people in a stand) and use that mask as the matte, without LTX." M {Auto Text Click Box Roto Crowd}}
  select_mode Text
  addUserKnob {1 subject_text l Object t "What to matte, in a few words: doll, horse, red car. Several with commas: rider, horse."}
  addUserKnob {7 detect_threshold l "Detect threshold" t "How sure SAM3 must be to pick something. Lower it when part of the subject is missing (0.15 found a toy chainsaw that 0.3 missed); raise it when other things get picked too."}
@@ -42,6 +42,8 @@ Gizmo {
  garb_soft 12
  addUserKnob {7 halo_cut l "Halo cut" t "Around the subject, matte values below this are removed and the rest stretched back to full. Hair strands are strong and stay; the faint ring LTX can leave at the edge of the isolated plate goes. 0 keeps everything LTX gave."}
  halo_cut 0.35
+ addUserKnob {7 crowd_soft l "Crowd softness" t "Crowd only: softness of the SAM3 mask edge used as the matte, in pixels."}
+ crowd_soft 2
  addUserKnob {6 garbage_on l "Clean matte with subject" t "Multiply the matte by the subject mask. Applies whenever a subject is selected." +STARTLINE}
  garbage_on true
  addUserKnob {26 output_title l "" +STARTLINE T <b>Output</b>}
@@ -111,7 +113,7 @@ Gizmo {
   xpos 220
   ypos 66
  }
-set N7a8c6000 [stack 0]
+set N31c56000 [stack 0]
  Input {
   inputs 0
   name Roto
@@ -152,7 +154,7 @@ set N7a8c6000 [stack 0]
   xpos 660
   ypos 198
  }
-set N7a8cef00 [stack 0]
+set N31c5ef00 [stack 0]
  Dilate {
   channels alpha
   size {{parent.iso_expand}}
@@ -167,8 +169,8 @@ set N7a8cef00 [stack 0]
   xpos 880
   ypos 264
  }
-push $N7a8c6000
-push $N7a8c6000
+push $N31c56000
+push $N31c56000
  Expression {
   expr0 0.18
   expr1 0.18
@@ -183,25 +185,33 @@ push $N7a8c6000
   xpos 1100
   ypos 330
  }
-push $N7a8cef00
-push $N7a8c6000
+push $N31c5ef00
+push $N31c56000
  Copy {
   inputs 2
   from0 rgba.alpha
   to0 rgba.alpha
   name SubjectOnPlate
-  xpos 2640
-  ypos 792
+  xpos 2860
+  ypos 858
  }
  Expression {
   expr0 "r * (0.12 + 0.88 * a)"
   expr1 "g * (0.12 + 0.88 * a)"
   expr2 "b * (0.12 + 0.88 * a)"
   name SubjectView
-  xpos 2750
-  ypos 825
+  xpos 2970
+  ypos 891
  }
-push $N7a8cef00
+push $N31c5ef00
+ Blur {
+  channels alpha
+  size {{parent.crowd_soft}}
+  name CrowdMatte
+  xpos 2310
+  ypos 693
+ }
+push $N31c5ef00
  Dilate {
   channels alpha
   size {{parent.garb_expand}}
@@ -216,7 +226,7 @@ push $N7a8cef00
   xpos 1650
   ypos 495
  }
-push $N7a8cef00
+push $N31c5ef00
  Blur {
   channels alpha
   size 3
@@ -250,7 +260,7 @@ push $N7a8cef00
   xpos 1430
   ypos 429
  }
-set N7a8d1200 [stack 0]
+set N31c61200 [stack 0]
  Copy {
   inputs 2
   from0 rgba.alpha
@@ -275,7 +285,7 @@ set N7a8d1200 [stack 0]
   xpos 2090
   ypos 627
  }
-push $N7a8d1200
+push $N31c61200
  Switch {
   inputs 2
   which {{"parent.garbage_on && parent.select_mode != 0"}}
@@ -283,40 +293,47 @@ push $N7a8d1200
   xpos 2200
   ypos 660
  }
-set N7a949900 [stack 0]
+ Switch {
+  inputs 2
+  which {{"parent.select_mode == 5"}}
+  name MatteChoice
+  xpos 2420
+  ypos 726
+ }
+set N31cda300 [stack 0]
  Expression {
   expr0 a
   expr1 a
   expr2 a
   name MatteView
-  xpos 2530
-  ypos 759
+  xpos 2750
+  ypos 825
  }
-push $N7a949900
-push $N7a8c6000
+push $N31cda300
+push $N31c56000
  Copy {
   inputs 2
   from0 rgba.alpha
   to0 rgba.alpha
   name MatteToPlate
-  xpos 2310
-  ypos 693
+  xpos 2530
+  ypos 759
  }
  Premult {
   name Final
-  xpos 2420
-  ypos 726
+  xpos 2640
+  ypos 792
  }
  Switch {
   inputs 5
   which {{parent.view}}
   name View
-  xpos 2860
-  ypos 858
+  xpos 3080
+  ypos 924
  }
  Output {
   name Output1
-  xpos 2970
-  ypos 891
+  xpos 3190
+  ypos 957
  }
 end_group

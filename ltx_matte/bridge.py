@@ -66,12 +66,16 @@ def knob_changed(node, knob):
 def show_mode(node):
     """Show only the controls of the chosen way to select the subject."""
     mode = node["select_mode"].value()
-    for knob, modes in (("subject_text", ("Text",)), ("select_frame", ("Click", "Box")),
-                        ("find_subject", ("Text", "Click", "Box")), ("detect_threshold", ("Text", "Click", "Box")),
+    for knob, modes in (("subject_text", ("Text", "Crowd")), ("select_frame", ("Click", "Box")),
+                        ("find_subject", ("Text", "Click", "Box", "Crowd")),
+                        ("detect_threshold", ("Text", "Click", "Box", "Crowd")),
+                        ("queue_job", ("Auto", "Text", "Click", "Box", "Roto")),
+                        ("garb_expand", ("Text", "Click", "Box", "Roto")), ("garb_soft", ("Text", "Click", "Box", "Roto")),
+                        ("halo_cut", ("Text", "Click", "Box", "Roto")), ("iso_expand", ("Text", "Click", "Box", "Roto")),
                         ("p1", ("Click",)), ("p2", ("Click",)), ("p3", ("Click",)),
                         ("p1_on", ("Click",)), ("p2_on", ("Click",)), ("p3_on", ("Click",)),
                         ("n1", ("Click",)), ("n1_on", ("Click",)), ("subject_box", ("Box",)),
-                        ("isolate", ("Text", "Click", "Box", "Roto"))):
+                        ("isolate", ("Text", "Click", "Box", "Roto")), ("crowd_soft", ("Crowd",))):
         if node.knob(knob) is not None:
             node[knob].setVisible(mode in modes)
 
@@ -170,12 +174,20 @@ def version_up(node):
 # --- what to send ----------------------------------------------------------------------------------
 
 def frame_range(node):
-    return graph.frame_count(int(node["plate_first"].value()), int(node["plate_last"].value()))
+    first, last = int(node["plate_first"].value()), int(node["plate_last"].value())
+    if node["select_mode"].value() == graph.CROWD:  # no LTX render, so any length works
+        if last < first:
+            raise ValueError("Last must be at or after First.")
+        return first, last
+    return graph.frame_count(first, last)
 
 
 def selection(node, size, first, last):
     """The SAM3 selection for the chosen mode, in render pixels, or None for Auto and Roto."""
     mode = node["select_mode"].value()
+    if mode == graph.CROWD:
+        return {"mode": mode, "text": node["subject_text"].value(),
+                "threshold": round(float(node["detect_threshold"].value()), 3)}
     if mode not in graph.SAM_MODES:
         return None
     plate_width, plate_height = plate_format(node)
@@ -244,14 +256,18 @@ def ocio_colorspaces(host):
 
 def find_subject(node):
     """Step 1: track the chosen subject with SAM3 and show its mask."""
-    if node["select_mode"].value() not in graph.SAM_MODES:
-        nuke.message("Find Subject is for Text, Click and Box. Auto needs no subject; Roto uses the second input.")
+    if node["select_mode"].value() not in (*graph.SAM_MODES, graph.CROWD):
+        nuke.message("Find Subject is for Text, Click, Box and Crowd. Auto needs no subject; Roto uses the second input.")
         return
     start(node, "select")
 
 
 def queue(node):
     """Step 2: render the matte, with the subject isolated when one was chosen."""
+    if node["select_mode"].value() == graph.CROWD:
+        nuke.message("Crowd uses the SAM3 mask itself as the matte, so there is nothing to render with LTX: "
+                     "after Find Subject, View > Final already shows it.")
+        return
     start(node, "matte")
 
 
@@ -365,7 +381,7 @@ def run(context, host, folder, settings, export, stop):
         uploaded = client.upload(host, video)
         local = server_shares_files(host)
         exr_folder = (folder / "EXR").as_posix() if local else f"LTXMatte/{settings['job_name']}/EXR"
-        prompt = build(settings, uploaded, exr_folder, ocio_colorspaces(host))
+        prompt = build(settings, uploaded, exr_folder, ocio_colorspaces(host), host)
         reply = client.json_request(host, "/prompt", {"prompt": prompt, "client_id": context[1]})
         job_id = reply["prompt_id"]
         publish(context, "Queued in ComfyUI", job=(job_id, host, folder))
@@ -378,6 +394,10 @@ def run(context, host, folder, settings, export, stop):
         first_exr = collect(host, folder, entry, writer, sequence_name, exr_folder, local, stop)
         if first_exr is None:
             return publish(context, "Canceled while collecting", terminal=True)
+        if kind == "select" and settings["selection"]["mode"] == graph.CROWD:
+            publish(context, "Crowd found: View > Final shows the plate with it as alpha",
+                    result={"select": first_exr}, terminal=True)
+            return
         if kind == "select":
             key = selection_key(settings["selection"], settings["first"], settings["last"], settings["size"])
             (folder / "Selection.json").write_text(key, encoding="utf-8")
@@ -410,10 +430,20 @@ def explain(error, kind, settings):
             "Try: a smaller Size (the arrows), or a shorter frame range.\n\n" + first_line)
 
 
-def build(settings, uploaded, exr_folder, colorspaces):
+def crowd_model(host):
+    """A SAM3 Segment model the server offers, preferring the one most likely installed already."""
+    info = (client.json_request(host, "/object_info/SAM3Segment") or {}).get("SAM3Segment")
+    if not info:
+        raise RuntimeError("Crowd needs the SAM3 Segment node from comfyui-rmbg on the ComfyUI server.")
+    choices = combo_choices(info.get("input", {}).get("required", {}).get("model_name")) or []
+    return next((name for name in graph.CROWD_MODELS if name in choices), choices[0] if choices else "sam3")
+
+
+def build(settings, uploaded, exr_folder, colorspaces, host=None):
     if settings["kind"] == "select":
+        crowd = crowd_model(host) if settings["selection"]["mode"] == graph.CROWD else "sam3"
         return graph.build_select_prompt(uploaded, settings["frames"], settings["fps"], settings["size"],
-                                         settings["selection"], exr_folder, colorspaces)
+                                         settings["selection"], exr_folder, colorspaces, crowd)
     return graph.build_prompt(uploaded, settings["frames"], settings["fps"], settings["size"], settings["seed"],
                               settings["positive"], settings["negative"], settings["models"],
                               settings["job_name"], None, exr_folder, colorspaces, settings["lora_strength"])
@@ -533,7 +563,7 @@ def apply_update(context, status, job, result, terminal):
         load_sequence(node.node("SelectRead" if kind == "select" else "MatteRead"), path,
                       int(node["plate_first"].value()))
         if kind == "select":
-            node["view"].setValue("Subject")
+            node["view"].setValue("Final" if node["select_mode"].value() == graph.CROWD else "Subject")
         else:
             node["view"].setValue("Final")
 
@@ -619,6 +649,14 @@ def verify_setup(host, models):
     missing = [problem for problem in validate.problems(select, catalog) if "plate.mp4" not in problem]
     lines.append("Subject selection (SAM3): ready." if not missing else
                  "Subject selection (SAM3) is not available, so only Auto and Roto work:\n" + "\n".join(missing[:6]))
+    try:
+        crowd = graph.build_select_prompt("plate.mp4", 9, 24, (512, 512), {"mode": graph.CROWD, "text": "x"},
+                                          "check", colorspaces, crowd_model(host))
+        crowd_missing = [problem for problem in validate.problems(crowd, catalog) if "plate.mp4" not in problem]
+    except RuntimeError as error:
+        crowd_missing = [str(error)]
+    lines.append("Crowd (SAM3 Segment, frame by frame): ready." if not crowd_missing else
+                 "Crowd is not available:\n" + "\n".join(crowd_missing[:4]))
     return "\n".join(lines)
 
 

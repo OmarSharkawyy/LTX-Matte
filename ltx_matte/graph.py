@@ -43,7 +43,13 @@ VIEWER_ONLY = {"5544", "9045", "9087", "9089", "9090", "9091"}  # previews, time
 MATTE_WRITER, SELECT_WRITER = "9600", "9601"
 SAM_LOADER, SAM_SEGMENT, SAM_PROPAGATE, SAM_OUTPUT = "9610", "9611", "9612", "9613"
 SAM_POINTS, SAM_BOXES, SAM_MASK_IMAGE = "9614", "9615", "9616"
-SELECT_MODES = ("Auto", "Text", "Click", "Box", "Roto")
+SELECT_MODES = ("Auto", "Text", "Click", "Box", "Roto", "Crowd")
+# Crowd finds every match on each frame on its own (SAM3 Segment from comfyui-rmbg) instead of tracking
+# each one as an object through the shot: tracking hundreds of people in an arena needed about 18 GB,
+# frame by frame about 9 GB. Its mask is the matte; LTX adds nothing for people that small.
+CROWD = "Crowd"
+CROWD_NODE, CROWD_JOIN = 9620, 9640
+CROWD_MODELS = ("sam3", "sam3.1_multiplex_fp16")
 # SAM3 confidence needed to pick something. Its own default, 0.3, missed a toy chainsaw that 0.15 found;
 # 0.1 also picked a person as "doll". Tested on a puppet shot, so it is a starting point, not a rule.
 DETECT_THRESHOLD = 0.15
@@ -226,13 +232,38 @@ def build_prompt(plate, frames, fps, size, seed, positive, negative, models, job
     return prune(prompt)
 
 
-def build_select_prompt(plate, frames, fps, size, selection, exr_folder, colorspaces=("sRGB - Display", "ACEScg")):
+def crowd_nodes(selection, model="sam3"):
+    """SAM3 Segment on every frame for each word, joined into one mask per frame. No tracking."""
+    terms = [part.strip() for part in str(selection.get("text", "")).split(",") if part.strip()]
+    if not terms:
+        raise ValueError("Type what to select in the crowd, for example: person, or: spectator.")
+    nodes, combined = {}, None
+    for index, term in enumerate(terms):
+        node = str(CROWD_NODE + index)
+        nodes[node] = {"class_type": "SAM3Segment", "inputs": {
+            "image": PLATE_IMAGES, "model_name": model, "prompt": term, "output_mode": "Merged",
+            "confidence_threshold": max(0.05, float(selection.get("threshold", DETECT_THRESHOLD))),
+            "max_segments": 0, "segment_pick": 0, "mask_blur": 0, "mask_offset": 0, "device": "Auto",
+            "invert_output": False, "unload_model": False, "background": "Alpha", "background_color": "#222222"}}
+        if combined is None:
+            combined = [node, 1]
+        else:
+            join = str(CROWD_JOIN + index)
+            nodes[join] = {"class_type": "MaskComposite", "inputs": {
+                "destination": combined, "source": [node, 1], "x": 0, "y": 0, "operation": "or"}}
+            combined = [join, 0]
+    nodes[SAM_MASK_IMAGE] = {"class_type": "MaskToImage", "inputs": {"mask": combined}}
+    return nodes
+
+
+def build_select_prompt(plate, frames, fps, size, selection, exr_folder, colorspaces=("sRGB - Display", "ACEScg"),
+                        crowd_model="sam3"):
     """The ComfyUI prompt that only finds the subject: the workflow's own plate loading, then SAM3.
 
     It loads and sizes the plate exactly as the matte job does, so the subject mask lines up with the matte.
     """
-    if not selection or selection.get("mode") not in SAM_MODES:
-        raise ValueError("Finding a subject needs Text, Click or Box.")
+    if not selection or selection.get("mode") not in (*SAM_MODES, CROWD):
+        raise ValueError("Finding a subject needs Text, Click, Box or Crowd.")
     width, height = size
     full = template()
     prompt = {node: full[node] for node in (LOAD_VIDEO, FRAME_LIMIT, PLATE_IMAGES[0])}
@@ -243,7 +274,10 @@ def build_select_prompt(plate, frames, fps, size, selection, exr_folder, colorsp
     resize["resize_type.shorter_size"] = min(width, height)
     if isinstance(resize.get("resize_type.shorter_size"), list):  # never linked to a node left out here
         resize["resize_type.shorter_size"] = min(width, height)
-    prompt.update(selection_nodes(selection, frames))
+    if selection["mode"] == CROWD:
+        prompt.update(crowd_nodes(selection, crowd_model))
+    else:
+        prompt.update(selection_nodes(selection, frames))
     prompt[SELECT_WRITER] = exr_writer([SAM_MASK_IMAGE, 0], "Select", exr_folder, colorspaces)
     return prune(prompt)
 

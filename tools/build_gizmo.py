@@ -10,7 +10,7 @@ import nuke
 
 ROOT = Path(__file__).resolve().parents[1]
 BRIDGE = "from ltx_matte import bridge; bridge.{}(nuke.thisNode())"
-MODES = ["Auto", "Text", "Click", "Box", "Roto"]
+MODES = ["Auto", "Text", "Click", "Box", "Roto", "Crowd"]
 VIEWS = ["Final", "Matte", "Subject", "Isolated", "Plate"]
 
 
@@ -53,7 +53,8 @@ def add_controls(group):
     text(group, "subject_title", "<b>Subject</b>")
     knob(group, nuke.Enumeration_Knob("select_mode", "Select", MODES),
          "Auto: LTX mattes whatever it sees as foreground. Text: type what to matte. Click: place points on it "
-         "in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input.")
+         "in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input. "
+         "Crowd: find every match on each frame (people in a stand) and use that mask as the matte, without LTX.")
     knob(group, nuke.String_Knob("subject_text", "Object"),
          "What to matte, in a few words: doll, horse, red car. Several with commas: rider, horse.")
     knob(group, nuke.Double_Knob("detect_threshold", "Detect threshold"),
@@ -81,6 +82,8 @@ def add_controls(group):
          "Around the subject, matte values below this are removed and the rest stretched back to full. Hair "
          "strands are strong and stay; the faint ring LTX can leave at the edge of the isolated plate goes. "
          "0 keeps everything LTX gave.")
+    knob(group, nuke.Double_Knob("crowd_soft", "Crowd softness"),
+         "Crowd only: softness of the SAM3 mask edge used as the matte, in pixels.")
     knob(group, nuke.Boolean_Knob("garbage_on", "Clean matte with subject"),
          "Multiply the matte by the subject mask. Applies whenever a subject is selected.")
 
@@ -142,7 +145,7 @@ def defaults(group):
     from ltx_matte import graph
     values = {"plate_first": 1, "plate_last": 49, "select_frame": 1, "select_mode": "Text", "subject_text": "",
               "p1_on": True, "isolate": True, "iso_expand": 12, "garb_expand": 24, "garb_soft": 12,
-              "garbage_on": True, "halo_cut": 0.35, "detect_threshold": 0.15, "size_short": 704, "view": "Final", "start_at": 1, "start_follows": True,
+              "garbage_on": True, "halo_cut": 0.35, "detect_threshold": 0.15, "crowd_soft": 2, "size_short": 704, "view": "Final", "start_at": 1, "start_follows": True,
               "seed_text": "42", "output_version": 1, "server": "http://127.0.0.1:8188", "job_status": "Idle",
               "lora_strength": 1.0, "positive": "", "negative": ""}
     values.update(graph.default_models())
@@ -214,6 +217,12 @@ def build_internals(group):
         cleaned["expr3"].setValue("r * a + (1 - r) * g * clamp((a - h) / max(1 - h, 0.001))")
         use_clean = nuke.nodes.Switch(name="UseClean", inputs=[matte, cleaned])
         use_clean["which"].setExpression("parent.garbage_on && parent.select_mode != 0")
+        # Crowd: the frame-by-frame SAM3 mask is the matte, softened a little; there is no LTX render.
+        crowd = nuke.nodes.Blur(name="CrowdMatte", inputs=[subject], channels="alpha")
+        crowd["size"].setExpression("parent.crowd_soft")
+        matte_choice = nuke.nodes.Switch(name="MatteChoice", inputs=[use_clean, crowd])
+        matte_choice["which"].setExpression("parent.select_mode == 5")
+        use_clean = matte_choice
 
         with_alpha = nuke.nodes.Copy(name="MatteToPlate", inputs=[plate_in, use_clean], from0="rgba.alpha",
                                      to0="rgba.alpha")

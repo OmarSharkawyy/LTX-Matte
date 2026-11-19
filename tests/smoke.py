@@ -113,7 +113,28 @@ def selection_test():
     raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), {"mode": "Text", "text": " , "}, "x"), "Type")
     raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), {"mode": "Click", "positive": []}, "x"), "point")
     raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), {"mode": "Box", "box": (5, 5, 6, 6)}, "x"), "box")
-    raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), None, "x"), "Text, Click or Box")
+    raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), None, "x"), "Text, Click, Box or Crowd")
+
+
+def crowd_test():
+    one = graph.build_select_prompt("plate.mp4", 30, 24, (1280, 704), {"mode": "Crowd", "text": "human", "threshold": 0.15},
+                                    "LTXMatte/j/EXR", crowd_model="sam3")
+    assert validate.problems(one, CATALOG) == [], validate.problems(one, CATALOG)[:5]
+    kinds = [step["class_type"] for step in one.values()]
+    assert "SAM3Segment" in kinds and "SAM3Propagate" not in kinds, "frame by frame, no tracking"
+    assert "UNETLoader" not in kinds, "no LTX for a crowd"
+    segment = next(step["inputs"] for step in one.values() if step["class_type"] == "SAM3Segment")
+    assert (segment["prompt"], segment["output_mode"], segment["confidence_threshold"], segment["image"]) == (
+        "human", "Merged", 0.15, graph.PLATE_IMAGES)
+    assert one[graph.SELECT_WRITER]["inputs"]["filename"] == "Select"
+    two = graph.build_select_prompt("plate.mp4", 9, 24, (1280, 704), {"mode": "Crowd", "text": "person, flag"}, "x")
+    assert validate.problems(two, CATALOG) == []
+    assert sorted(step["inputs"]["prompt"] for step in two.values() if step["class_type"] == "SAM3Segment") == [
+        "flag", "person"]
+    low = graph.build_select_prompt("p", 9, 24, (512, 512), {"mode": "Crowd", "text": "x", "threshold": 0.01}, "x")
+    assert next(step["inputs"] for step in low.values() if step["class_type"] == "SAM3Segment")[
+        "confidence_threshold"] == 0.05, "kept inside the node's own range"
+    raises(lambda: graph.build_select_prompt("p", 9, 24, (512, 512), {"mode": "Crowd", "text": " "}, "x"), "crowd")
 
 
 def validator_test():
@@ -147,9 +168,9 @@ def package_test():
     gizmo = (ROOT / "LTXMatte.gizmo").read_text(encoding="utf-8")
     assert gizmo.startswith("Gizmo {") and "selected true" not in gizmo
     for knob in ("select_mode", "subject_text", "find_subject", "queue_job", "isolate", "garb_expand", "view",
-                 "size_short", "start_follows", "alpha_lora", "server", "halo_cut", "detect_threshold"):
+                 "size_short", "start_follows", "alpha_lora", "server", "halo_cut", "detect_threshold", "crowd_soft"):
         assert f" {knob} " in gizmo or f"{{{knob} " in gizmo or f" {knob}\n" in gizmo, knob
-    for internal in ("SelectRead", "MatteRead", "ToRender", "PlateIn", "CleanMatte", "Output"):
+    for internal in ("SelectRead", "MatteRead", "ToRender", "PlateIn", "CleanMatte", "CrowdMatte", "Output"):
         assert internal in gizmo, internal
     menu = (ROOT / "menu.py").read_text(encoding="utf-8")
     assert "bridge.create()" in menu and "comfyui_menu.png" in menu and "import ltx_matte" not in menu
@@ -161,7 +182,7 @@ def package_test():
 
 def main():
     for name, step in (("frame and size rules", rules_test), ("matte job", prompt_test),
-                       ("subject selection", selection_test), ("workflow checker", validator_test), ("error messages", message_test),
+                       ("subject selection", selection_test), ("crowd", crowd_test), ("workflow checker", validator_test), ("error messages", message_test),
                        ("gizmo and menu", package_test)):
         step()
         print(f"ok     {name}")

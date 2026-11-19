@@ -1880,6 +1880,131 @@
    "SAM3_VIDEO_STATE"
   ]
  },
+ "SAM3Segment": {
+  "input": {
+   "optional": {
+    "background": [
+     [
+      "Alpha",
+      "Color"
+     ],
+     {
+      "default": "Alpha"
+     }
+    ],
+    "background_color": [
+     "COLORCODE",
+     {
+      "default": "#222222"
+     }
+    ],
+    "device": [
+     [
+      "Auto",
+      "CPU",
+      "GPU"
+     ],
+     {
+      "default": "Auto"
+     }
+    ],
+    "invert_output": [
+     "BOOLEAN",
+     {
+      "default": false
+     }
+    ],
+    "mask_blur": [
+     "INT",
+     {
+      "default": 0,
+      "max": 64,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "mask_offset": [
+     "INT",
+     {
+      "default": 0,
+      "max": 64,
+      "min": -64,
+      "step": 1
+     }
+    ],
+    "max_segments": [
+     "INT",
+     {
+      "default": 0,
+      "max": 128,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "segment_pick": [
+     "INT",
+     {
+      "default": 0,
+      "max": 128,
+      "min": 0,
+      "step": 1
+     }
+    ],
+    "unload_model": [
+     "BOOLEAN",
+     {
+      "default": false
+     }
+    ]
+   },
+   "required": {
+    "confidence_threshold": [
+     "FLOAT",
+     {
+      "default": 0.5,
+      "max": 0.95,
+      "min": 0.05,
+      "step": 0.01
+     }
+    ],
+    "image": [
+     "IMAGE"
+    ],
+    "model_name": [
+     [
+      "sam3.1_multiplex_fp16",
+      "sam3"
+     ],
+     {
+      "default": "sam3.1_multiplex_fp16"
+     }
+    ],
+    "output_mode": [
+     [
+      "Merged",
+      "Separate"
+     ],
+     {
+      "default": "Merged"
+     }
+    ],
+    "prompt": [
+     "STRING",
+     {
+      "default": "",
+      "multiline": true,
+      "placeholder": "Describe the concept"
+     }
+    ]
+   }
+  },
+  "output": [
+   "IMAGE",
+   "MASK",
+   "IMAGE",
+   "BBOX"
+  ]
+ },
  "SAM3VideoOutput": {
   "input": {
    "optional": {
