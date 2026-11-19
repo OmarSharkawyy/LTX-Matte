@@ -93,6 +93,7 @@ def selection_test():
         segment = select[graph.SAM_SEGMENT]["inputs"]
         assert segment["prompt_mode"] == graph.SAM_MODES[mode] and segment["video_frames"] == graph.PLATE_IMAGES
         assert select[graph.SAM_PROPAGATE]["inputs"]["direction"] == "both"
+        assert segment["score_threshold"] == graph.DETECT_THRESHOLD == 0.15, "the tested default"
         with_matte = graph.build_prompt("plate.mp4", 25, 24, (1280, 704), 1, "", "", models, "j", chosen)
         assert validate.problems(with_matte, CATALOG) == []
     text = graph.build_select_prompt("plate.mp4", 25, 24, (1280, 704), cases["Text"], "x")
@@ -136,7 +137,7 @@ def package_test():
     gizmo = (ROOT / "LTXMatte.gizmo").read_text(encoding="utf-8")
     assert gizmo.startswith("Gizmo {") and "selected true" not in gizmo
     for knob in ("select_mode", "subject_text", "find_subject", "queue_job", "isolate", "garb_expand", "view",
-                 "size_short", "start_follows", "alpha_lora", "server", "halo_cut"):
+                 "size_short", "start_follows", "alpha_lora", "server", "halo_cut", "detect_threshold"):
         assert f" {knob} " in gizmo or f"{{{knob} " in gizmo or f" {knob}\n" in gizmo, knob
     for internal in ("SelectRead", "MatteRead", "ToRender", "PlateIn", "CleanMatte", "Output"):
         assert internal in gizmo, internal

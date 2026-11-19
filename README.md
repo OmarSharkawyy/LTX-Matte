@@ -67,7 +67,7 @@ A puppet on a green screen, held on rods by three puppeteers whose hands touch i
    | **Roto** | Connect your own Roto or mask to the second input, **Roto**. No Find Subject step. |
    | **Auto** | No selection: LTX mattes whatever it sees as foreground. |
 
-3. Click **Find Subject** (Text, Click, Box). When it finishes, **View** switches to **Subject**: the subject is bright and the rest of the plate dimmed. If it picked the wrong thing, change the word, the points or the box and find it again.
+3. Click **Find Subject** (Text, Click, Box). **Detect threshold** (0.15) is how sure SAM3 must be: lower it when part of the subject is missing, raise it when other things get picked too. On the test shot, 0.3 (SAM3's own default) missed the toy chainsaw, 0.15 found it, and 0.1 also took a puppeteer as "doll". When it finishes, **View** switches to **Subject**: the subject is bright and the rest of the plate dimmed. If it picked the wrong thing, change the word, the points or the box and find it again.
 4. Click **Queue Matte**. **View** → **Isolated** shows what LTX receives. When the matte is back, **View** switches to **Final**: the plate with the matte as alpha, premultiplied.
 5. Adjust without rendering again. **View** → **Matte** shows the alpha alone.
    - Inside the subject mask, the LTX matte is kept as it is.

@@ -44,6 +44,9 @@ MATTE_WRITER, SELECT_WRITER = "9600", "9601"
 SAM_LOADER, SAM_SEGMENT, SAM_PROPAGATE, SAM_OUTPUT = "9610", "9611", "9612", "9613"
 SAM_POINTS, SAM_BOXES, SAM_MASK_IMAGE = "9614", "9615", "9616"
 SELECT_MODES = ("Auto", "Text", "Click", "Box", "Roto")
+# SAM3 confidence needed to pick something. Its own default, 0.3, missed a toy chainsaw that 0.15 found;
+# 0.1 also picked a person as "doll". Tested on a puppet shot, so it is a starting point, not a rule.
+DETECT_THRESHOLD = 0.15
 SAM_MODES = {"Text": "text", "Click": "point", "Box": "box"}
 
 
@@ -109,7 +112,7 @@ def selection_nodes(selection, frames):
         SAM_LOADER: {"class_type": "LoadSAM3Model", "inputs": {"precision": "auto", "compile": False}},
         SAM_SEGMENT: {"class_type": "SAM3VideoSegmentation", "inputs": {
             "prompt_mode": mode, "video_frames": PLATE_IMAGES, "frame_idx": frame,
-            "score_threshold": float(selection.get("threshold", 0.3))}},
+            "score_threshold": float(selection.get("threshold", DETECT_THRESHOLD))}},
         SAM_PROPAGATE: {"class_type": "SAM3Propagate", "inputs": {
             "sam3_model_config": [SAM_LOADER, 0], "video_state": [SAM_SEGMENT, 0],
             "start_frame": frame, "end_frame": -1, "direction": "both"}},

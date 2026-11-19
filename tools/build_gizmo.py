@@ -56,6 +56,9 @@ def add_controls(group):
          "in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input.")
     knob(group, nuke.String_Knob("subject_text", "Object"),
          "What to matte, in a few words: doll, horse, red car. Several with commas: rider, horse.")
+    knob(group, nuke.Double_Knob("detect_threshold", "Detect threshold"),
+         "How sure SAM3 must be to pick something. Lower it when part of the subject is missing (0.15 found a "
+         "toy chainsaw that 0.3 missed); raise it when other things get picked too.")
     knob(group, nuke.Int_Knob("select_frame", "On frame"),
          "The frame where your points or box sit. The subject is tracked from there through the range.")
     for index in (1, 2, 3):
@@ -139,7 +142,7 @@ def defaults(group):
     from ltx_matte import graph
     values = {"plate_first": 1, "plate_last": 49, "select_frame": 1, "select_mode": "Text", "subject_text": "",
               "p1_on": True, "isolate": True, "iso_expand": 12, "garb_expand": 24, "garb_soft": 12,
-              "garbage_on": True, "halo_cut": 0.35, "size_short": 704, "view": "Final", "start_at": 1, "start_follows": True,
+              "garbage_on": True, "halo_cut": 0.35, "detect_threshold": 0.15, "size_short": 704, "view": "Final", "start_at": 1, "start_follows": True,
               "seed_text": "42", "output_version": 1, "server": "http://127.0.0.1:8188", "job_status": "Idle",
               "lora_strength": 1.0, "positive": "", "negative": ""}
     values.update(graph.default_models())

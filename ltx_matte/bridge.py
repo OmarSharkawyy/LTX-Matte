@@ -67,7 +67,7 @@ def show_mode(node):
     """Show only the controls of the chosen way to select the subject."""
     mode = node["select_mode"].value()
     for knob, modes in (("subject_text", ("Text",)), ("select_frame", ("Click", "Box")),
-                        ("find_subject", ("Text", "Click", "Box")),
+                        ("find_subject", ("Text", "Click", "Box")), ("detect_threshold", ("Text", "Click", "Box")),
                         ("p1", ("Click",)), ("p2", ("Click",)), ("p3", ("Click",)),
                         ("p1_on", ("Click",)), ("p2_on", ("Click",)), ("p3_on", ("Click",)),
                         ("n1", ("Click",)), ("n1_on", ("Click",)), ("subject_box", ("Box",)),
@@ -183,7 +183,8 @@ def selection(node, size, first, last):
     frame = int(node["select_frame"].value()) if mode != "Text" else first
     if not first <= frame <= last:
         raise ValueError(f"Select on a frame inside the range {first}-{last}.")
-    chosen = {"mode": mode, "frame": frame - first, "text": node["subject_text"].value()}
+    chosen = {"mode": mode, "frame": frame - first, "text": node["subject_text"].value(),
+              "threshold": round(float(node["detect_threshold"].value()), 3)}
     if mode == "Click":
         chosen["positive"] = [to_render(*node[name].value()) for name in ("p1", "p2", "p3")
                               if node[name + "_on"].value()]

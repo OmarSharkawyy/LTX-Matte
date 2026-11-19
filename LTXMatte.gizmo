@@ -14,6 +14,8 @@ Gizmo {
  addUserKnob {4 select_mode l Select t "Auto: LTX mattes whatever it sees as foreground. Text: type what to matte. Click: place points on it in the Viewer. Box: draw a box around it in the Viewer. Roto: use the mask on the second input." M {Auto Text Click Box Roto}}
  select_mode Text
  addUserKnob {1 subject_text l Object t "What to matte, in a few words: doll, horse, red car. Several with commas: rider, horse."}
+ addUserKnob {7 detect_threshold l "Detect threshold" t "How sure SAM3 must be to pick something. Lower it when part of the subject is missing (0.15 found a toy chainsaw that 0.3 missed); raise it when other things get picked too."}
+ detect_threshold 0.15
  addUserKnob {3 select_frame l "On frame" t "The frame where your points or box sit. The subject is tracked from there through the range."}
  select_frame 1
  addUserKnob {12 p1 l "Point 1" t "A point on the subject. Drag it in the Viewer."}
@@ -109,7 +111,7 @@ Gizmo {
   xpos 220
   ypos 66
  }
-set N16446000 [stack 0]
+set N7a8c6000 [stack 0]
  Input {
   inputs 0
   name Roto
@@ -150,7 +152,7 @@ set N16446000 [stack 0]
   xpos 660
   ypos 198
  }
-set N1644ef00 [stack 0]
+set N7a8cef00 [stack 0]
  Dilate {
   channels alpha
   size {{parent.iso_expand}}
@@ -165,8 +167,8 @@ set N1644ef00 [stack 0]
   xpos 880
   ypos 264
  }
-push $N16446000
-push $N16446000
+push $N7a8c6000
+push $N7a8c6000
  Expression {
   expr0 0.18
   expr1 0.18
@@ -181,8 +183,8 @@ push $N16446000
   xpos 1100
   ypos 330
  }
-push $N1644ef00
-push $N16446000
+push $N7a8cef00
+push $N7a8c6000
  Copy {
   inputs 2
   from0 rgba.alpha
@@ -199,7 +201,7 @@ push $N16446000
   xpos 2750
   ypos 825
  }
-push $N1644ef00
+push $N7a8cef00
  Dilate {
   channels alpha
   size {{parent.garb_expand}}
@@ -214,7 +216,7 @@ push $N1644ef00
   xpos 1650
   ypos 495
  }
-push $N1644ef00
+push $N7a8cef00
  Blur {
   channels alpha
   size 3
@@ -248,7 +250,7 @@ push $N1644ef00
   xpos 1430
   ypos 429
  }
-set N16451200 [stack 0]
+set N7a8d1200 [stack 0]
  Copy {
   inputs 2
   from0 rgba.alpha
@@ -273,7 +275,7 @@ set N16451200 [stack 0]
   xpos 2090
   ypos 627
  }
-push $N16451200
+push $N7a8d1200
  Switch {
   inputs 2
   which {{"parent.garbage_on && parent.select_mode != 0"}}
@@ -281,7 +283,7 @@ push $N16451200
   xpos 2200
   ypos 660
  }
-set N164c9900 [stack 0]
+set N7a949900 [stack 0]
  Expression {
   expr0 a
   expr1 a
@@ -290,8 +292,8 @@ set N164c9900 [stack 0]
   xpos 2530
   ypos 759
  }
-push $N164c9900
-push $N16446000
+push $N7a949900
+push $N7a8c6000
  Copy {
   inputs 2
   from0 rgba.alpha
